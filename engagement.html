@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERGEB Educational Workspace Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        /* BODY */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+            transition: 0.4s;
+            overflow-x: hidden;
+        }
+
+        /* DARK MODE */
+        .dark-mode {
+            background: #121212;
+            color: white;
+        }
+
+        /* STANDARD HEADER */
+        header {
+            background: linear-gradient(90deg, #003366, #0055aa);
+            color: white;
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideDown 1s ease;
+            text-align: center;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* LOGO */
+        .logo {
+            width: 90px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 5px;
+           
+            height: auto;
+        }
+
+        
+
+        /* TITLE */
+        header h1 {
+            font-size: 32px;
+            margin-top: 5px;
+            text-shadow: 2px 2px 5px black;
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: 0.4s;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        nav a:hover {
+            background: white;
+            color: #003366;
+            transform: scale(1.1);
+        }
+
+        /* DARK MODE BUTTON */
+        #modeBtn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #003366;
+            transition: 0.4s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #modeBtn:hover {
+            background: black;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 240px auto 0 auto;
+            padding: 20px; 
+        }
+
+        .app-page {
+            display: none;
+        }
+
+        .app-page.active {
+            display: block;
+        }
+
+        .workspace-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            transition: 0.5s;
+        }
+
+        .dark-mode .workspace-card {
+            background: #1e1e1e;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .interactive-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .dark-mode .interactive-card {
+            background: #252525;
+            border-color: #333;
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: #0055aa;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .interactive-card i {
+            font-size: 55px;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .interactive-card i {
+            color: #4da6ff;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+        }
+
+        .dark-mode input, .dark-mode select, .dark-mode textarea {
+            border-color: #444;
+            background: #2b2b2b;
+        }
+
+        .alert-node {
+            padding: 15px;
+            border-radius: 6px;
+            background: #fff3cd;
+            color: #856404;
+            border-left: 5px solid #ffcc00;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .dark-mode .alert-node {
+            background: #2c2515;
+            color: #ffcc00;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .dark-mode .data-table th, .dark-mode .data-table td {
+            border-color: #333;
+        }
+
+        /* BUTTON SYSTEM */
+        button.btn-student, button.btn-danger, button.btn-nav, button.btn-warn {
+            padding: 12px 22px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.4s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-student { background: #28a745; color: white; }
+        .btn-student:hover { background: #218838; transform: scale(1.05); }
+        
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #bd2130; transform: scale(1.05); }
+
+        .btn-warn { background: #ffcc00; color: #111; }
+        .btn-warn:hover { background: #e6b800; transform: scale(1.05); }
+        
+        .btn-nav { background: rgba(0,0,0,0.05); color: #333; }
+        .btn-nav:hover { transform: scale(1.05); }
+        .dark-mode .btn-nav { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .history-item {
+            background: rgba(0, 85, 170, 0.05);
+            border-left: 4px solid #0055aa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+        }
+        .dark-mode .history-item {
+            background: rgba(0, 85, 170, 0.15);
+        }
+
+        .breadcrumb-trail {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .dark-mode .breadcrumb-trail { color: #aaa; }
+
+        /* FOOTER */
+        footer {
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        .dark-mode footer {
+            background: black;
+        }
+
+        footer h3 {
+            margin-bottom: 10px;
+        }
+
+        /* SCROLL BUTTON */
+        .scrollTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 15px 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+            transition: 0.4s;
+            z-index: 999;
+        }
+
+        .scrollTop:hover {
+            background: green;
+            transform: scale(1.1);
+        }
+
+        /* PASSWORD MODAL UI */
+        .custom-auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .custom-auth-card {
+            width: 90%;
+            max-width: 450px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .dark-mode .custom-auth-card {
+            background: #222;
+            color: white;
+        }
+        .custom-auth-card i {
+            font-size: 45px;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+
+        /* RESPONSIVE MEDIA STYLES */
+        @media(max-width:768px){
+            header h1 { font-size: 26px; }
+            nav { flex-direction: column; gap: 8px; }
+            .container { margin-top: 360px; padding-left: 10px; padding-right: 10px; }
+            .workspace-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CUSTOM PASSWORD MODAL PAGE -->
+    <div id="customPasswordVerificationPageModal" class="custom-auth-overlay">
+        <div class="custom-auth-card">
+            <i class="fa fa-lock"></i>
+            <h2 id="customPasswordModalHeaderTitle">Security Authentication</h2>
+            <p id="customPasswordModalSubtextDescription" style="color: gray; margin: 10px 0 20px 0; font-size: 14px;">Please authorize access credentials for this node profile.</p>
+            <input type="password" id="customPasswordModalInputField" placeholder="Enter Secure Password..." style="margin-bottom: 20px; text-align: center;">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-danger" id="customPasswordModalCancelBtn"><i class="fa fa-times"></i> Cancel</button>
+                <button class="btn-student" id="customPasswordModalSubmitBtn"><i class="fa fa-check"></i> Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <header id="mainAppHeader">
+        <img src="OIP (1).webp" class="logo" alt="Logo">
+        <h1>ERGEB Educational Hub</h1>
+        <nav>
+            <a href="#" onclick="resetToHome()"><i class="fa fa-home"></i> Home</a>
+            <a href="exam.html"><i class="fa fa-book"></i> Exam</a>
+            <a href="resource.html"><i class="fa fa-star"></i> Resource</a>
+            <a href="engagement.html"><i class="fa fa-users"></i> Engagement</a>
+            <a href="comment.html"><i class="fa fa-comments"></i> Comment</a>
+        </nav>
+        <button id="modeBtn">🌙 Dark Mode</button>
+    </header>
+
+    <main class="container">
+
+        <!-- STREAM SELECTION PAGE -->
+        <section id="pageStreamSelection" class="app-page active"><br><br><br>
+            <div class="workspace-card">
+                <h1>Academic Resource Stream Selection</h1><br>
+                <p style="color: gray; margin-top: 5px;">Select your core program academic matrix node track to proceed.</p>
+                <div class="selection-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="interactive-card" onclick="selectStreamNode('Natural Science')">
+                        <i class="fa fa-atom"></i>
+                        <h3>Natural Science Stream</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Biological, physical, chemistry, english, and mathematical matrix nodes.</p>
+                    </div>
+                    <div class="interactive-card" onclick="selectStreamNode('Social Science')">
+                        <i class="fa fa-landmark"></i>
+                        <h3>Social Science Stream</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Geographic, historical, economics, and sociology context profiles.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRADE SELECTION PAGE -->
+        <section id="pageGradeSelection" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <div class="breadcrumb-trail" id="gradeBreadcrumb"></div>
+                <h1>Select Grade Level and Section Node</h1><br>
+                <p style="color: gray; margin-top: 5px;">Specify your unified active targeting year and group context parameter assignment matrix.</p>
+                
+                <div class="selection-grid">
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 9A')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 9A</h3>
+                    </div>
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 9B')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 9B</h3>
+                    </div>
+                    
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 10A')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 10A</h3>
+                    </div>
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 10B')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 10B</h3>
+                    </div>
+
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 11A')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 11A</h3>
+                    </div>
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 11B')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 11B</h3>
+                    </div>
+
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 12A')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 12A</h3>
+                    </div>
+                    <div class="interactive-card" onclick="selectGradeAndSectionNode('Grade 12B')">
+                        <i class="fa fa-layer-group"></i>
+                        <h3>Grade 12B</h3>
+                    </div>
+                </div>
+                <button class="btn-nav" style="margin-top: 25px;" onclick="switchAppStageView('pageStreamSelection')"><i class="fa fa-arrow-left"></i> Back to Streams</button>
+            </div>
+        </section>
+
+        <!-- GATEWAY ROLE VIEW SELECTION PAGE -->
+        <section id="pageViewSelection" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <div class="breadcrumb-trail" id="viewBreadcrumb"></div>
+                <h1>Select Operational Gateway View</h1><br>
+                <p style="color: gray; margin-top: 5px;">Access either the teacher administration desk console or student solution board workspace.</p>
+                <div class="selection-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="interactive-card" onclick="routeToTargetTerminalGateway('STUDENT')">
+                        <i class="fa fa-user-graduate" style="color:#28a745;"></i>
+                        <h3>Student Interactive View</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Check assigned tasks, view engagement history records, and dispatch corrections.</p>
+                    </div>
+                    <div class="interactive-card" onclick="routeToTargetTerminalGateway('TEACHER')">
+                        <i class="fa fa-chalkboard-teacher" style="color:#ffcc00;"></i>
+                        <h3>Teacher Management View</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Verify authentication keys, drop outstanding tasks matrices, and see incoming feeds.</p>
+                    </div>
+                </div>
+                <button class="btn-nav" style="margin-top: 25px;" onclick="switchAppStageView('pageGradeSelection')"><i class="fa fa-arrow-left"></i> Back to Grade & Section Selection</button>
+            </div>
+        </section>
+
+        <!-- STUDENT PORTAL MAIN HUB WORKSPACE -->
+        <section id="studentMainTerminalWorkspacePage" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <div class="breadcrumb-trail" id="studentWorkspaceBreadcrumb"></div>
+                <h1 style="color:#218838;"><i class="fa fa-graduation-cap"></i> Student Interactive Solution Hub</h1><br>
+                <p style="color:gray;">Enter your name below to access your personal dashboard portal.</p>
+
+                <div style="max-width:500px; margin:20px 0; padding:20px; background:rgba(0,0,0,0.02); border:1px solid #ddd; border-radius:8px;">
+                    <label id="studentInputLabel" style="margin-top:0;">Enter Student Full Name:</label>
+                    <div style="display:flex; gap:10px; margin-top:6px;">
+                        <input type="text" id="inputStudentPortalTraceNameKey" placeholder="Type your name here..." style="margin-top:0;">
+                        <button class="btn-student" onclick="executeStudentRegistryLookupPipeline()"><i class="fa fa-sign-in-alt"></i> Enter Dashboard</button>
+                    </div>
+                </div>
+
+                <!-- HIDDEN DASHBOARD -->
+                <div id="studentPersonalizedDashboardWorkspaceFrame" style="display:none; margin-top:25px; border-top:2px dashed #ccc; padding-top:20px;">
+                    <h3 id="studentGreetingProfileLabel" style="color:#111; margin-bottom:15px;">Profile Dashboard</h3>
+                    
+                    <div class="selection-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        
+                        <div style="background:#fff; border:1px solid #ddd; padding:20px; border-radius:8px;">
+                            <h4 style="color:#dc3545; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;"><i class="fa fa-exclamation-circle"></i> Assigned Missing Tasks Items List</h4>
+                            <div id="studentPortalDynamicMissedTasksCollectionFeedList"></div>
+                        </div>
+
+                        <div style="background:#fff; border:1px solid #ddd; padding:20px; border-radius:8px;">
+                            <h4 style="color:#0055aa; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;"><i class="fa fa-history"></i> Your Engagement History Log</h4>
+                            <div id="studentHistoricalEngagementLogTraceView" style="max-height: 280px; overflow-y: auto;">
+                                <p style="color:gray; font-style:italic; font-size:13px;">No past data records found.</p>
+                            </div>
+                        </div>
+
+                        <div style="background:#fff; border:1px solid #ddd; padding:20px; border-radius:8px;">
+                            <h4 style="color:#28a745; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;"><i class="fa fa-paper-plane"></i> Transmit Correction Content Solution</h4>
+                            
+                            <label>Target Course Subject Channel Node:</label>
+                            <select id="inputStudentSubmissionTargetDeptSelectNode"></select>
+
+                            <label>Question Reference # Index ID:</label>
+                            <input type="number" id="inputStudentSubmissionTargetQuestionRefNum" placeholder="Type the question ID you are answering...">
+
+                            <label style="margin-top:12px;">Step-By-Step Verified Solution Script Content Text:</label>
+                            <textarea id="inputStudentSubmissionSolutionTextareaBody" rows="4" placeholder="Write down descriptive structural corrections solutions text rows details..."></textarea>
+
+                            <button class="btn-student" style="width:100%; margin-top:15px;" onclick="dispatchStudentCorrectionPacketToTeacherHub()"><i class="fa fa-share-square"></i> Transmit Verification Packet</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <button class="btn-danger" onclick="switchAppStageView('pageViewSelection')"><i class="fa fa-arrow-left"></i> Exit Student Dashboard</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEACHER AUTHENTICATION SUBJECT NODES GATEWAY -->
+        <section id="teacherDepartmentGatePage" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <div class="breadcrumb-trail" id="teacherGateBreadcrumb"></div>
+                <h2><i class="fa fa-network-wired"></i> Select Academic Department Subject</h2><br>
+                <p style="color:gray; margin-bottom:20px;">Choose your primary course tracking subject workspace node.</p>
+                
+                <div class="selection-grid" id="teacherDeptSelectionGridContainer" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"></div>
+
+                <div style="margin-top:40px; padding-top:25px; border-top: 2px dashed #ddd; max-width:600px;">
+                    <h3 style="color:#003366;"><i class="fa fa-key"></i> Department Security Key Rotation Console</h3><br>
+                    <p style="color:gray; font-size:13px; margin-bottom:15px;">Modify or rewrite dynamic verification credentials inside storage nodes memory grids.</p>
+                    
+                    <label>Target Department Scope Instance:</label>
+                    <select id="adminPasswordChangeTargetSubjectSelect"></select>
+
+                    <label>Active Existing Authorization Key Token:</label>
+                    <input type="password" id="adminPasswordOldKeyToken" placeholder="Enter current setup password...">
+
+                    <label>Target Alternative Variable String Assignment:</label>
+                    <input type="password" id="adminPasswordNewKeyToken" placeholder="Type new customized password value...">
+
+                    <button class="btn-warn" style="margin-top:15px; width:100%;" onclick="executeAdminPasswordOverrideUpdate()"><i class="fa fa-sync-alt"></i> Apply New Protection Parameters</button>
+                </div>
+
+                <button class="btn-danger" style="margin-top:25px;" onclick="switchAppStageView('pageViewSelection')"><i class="fa fa-arrow-left"></i> Back to Gateways</button>
+            </div>
+        </section>
+
+        <!-- TEACHER CONTROL OPERATION SELECTION DASHBOARD -->
+        <section id="teacherActionSelectionPage" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <h1 style="color:#002b5c;"><i class="fa fa-shield-alt"></i> Subject Operations Console</h1><br>
+                <span id="activeSubjectPanelScopeBadge" style="background:#002b5c; color:white; padding:5px 12px; border-radius:30px; font-size:13px; font-weight:bold; margin-top:8px; display:inline-block;">Subject Scope</span>
+                <p style="color:gray; margin-top:15px; margin-bottom:20px;">Select your targeting configuration action trajectory route maps.</p>
+                
+                <div class="selection-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="interactive-card" onclick="routeTeacherTrajectoryAction('MANAGE_MISSED')">
+                        <i class="fa fa-clipboard-list" style="color:#e6b800;"></i>
+                        <h3>Manage Miss Questions</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Flag parameters lists constraints rows matched to explicit student profiles.</p>
+                    </div>
+                    <div class="interactive-card" onclick="routeTeacherTrajectoryAction('SEE_ENGAGEMENT')">
+                        <i class="fa fa-chart-line" style="color:#28a745;"></i>
+                        <h3>See the Engagement</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Monitor incoming text content data sets transmitted directly from secured student sessions.</p>
+                    </div>
+                </div>
+                <button class="btn-nav" style="margin-top:25px; color:#222;" onclick="switchAppStageView('teacherDepartmentGatePage')"><i class="fa fa-arrow-left"></i> Change Subject Target</button>
+            </div>
+        </section>
+
+        <!-- TEACHER MANAGE MISSED TASKS PANELS SECTION -->
+        <section id="teacherManageMissedActionTerminalPage" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <div style="display:flex; justify-content:between; align-items:center; border-bottom:2px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+                    <div>
+                        <h2 style="color:#002b5c;"><i class="fa fa-edit"></i> Missing Registry Management Terminal</h2><br>
+                        <span class="activeMissedTargetLabelDeptBadgeClass" style="background:#0055aa; color:white; padding:4px 10px; border-radius:30px; font-size:12px; font-weight:bold; margin-top:5px; display:inline-block;">Dept</span>
+                    </div>
+                </div>
+
+                <div class="alert-node">
+                    <i class="fa fa-info-circle"></i> Assign missing questions to student names. The student must use their self-registered password to view them.
+                </div>
+
+                <div style="max-width:600px; background:rgba(0,0,0,0.01); padding:20px; border-radius:8px; border:1px solid #ddd;">
+                    <h3>Log New Missing Matrix Constraint</h3>
+                    
+                    <label id="teacherConfigNameLabel">Target Student Name:</label>
+                    <input type="text" id="inputTeacherConfigStudentName" placeholder="Type student name (e.g., Rahel)...">
+
+                    <label>Assigned Missing Questions Reference Arrays (Comma-Separated Numbers):</label>
+                    <input type="text" id="inputTeacherConfigMissedQuestionsCsv" placeholder="e.g., 2, 5, 14, 22">
+
+                    <button class="btn-student" style="margin-top:20px; width:100%;" onclick="commitNewMissingQuestionRulesetEntry()"><i class="fa fa-save"></i> Save Ruleset Constraints Grid</button>
+                </div>
+
+                <button class="btn-nav" style="margin-top:25px; color:#222;" onclick="switchAppStageView('teacherActionSelectionPage')"><i class="fa fa-arrow-left"></i> Back to Subject Menu</button>
+            </div>
+        </section>
+
+        <!-- TEACHER VIEW LIVE FEED SUBMISSIONS TABLE SECTION -->
+        <section id="teacherSeeEngagementActionTerminalPage" class="app-page"><br><br><br>
+            <div class="workspace-card">
+                <h2 style="color:#28a745;"><i class="fa fa-chart-bar"></i> Live Student Correction Submissions Feed</h2><br>
+                <span class="activeEngagementTargetLabelDeptBadgeClass" style="background:#28a745; color:white; padding:4px 10px; border-radius:30px; font-size:12px; font-weight:bold; margin-bottom:20px; display:inline-block;">Dept</span>
+
+                <div style="overflow-x:auto; margin-top:15px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr style="background:rgba(0,0,0,0.04);">
+                                <th>Student Name</th>
+                                <th>Question Ref #</th>
+                                <th>Verified Correction Content Solution Script</th>
+                            </tr>
+                        </thead>
+                        <tbody id="liveTeacherEngagementLogsTableTableBodyFeed">
+                            <tr><td colspan="3" style="text-align:center; color:gray; font-style:italic;">No peer evaluation correction packets received from active student pipelines yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn-nav" style="margin-top:25px; color:#222;" onclick="switchAppStageView('teacherActionSelectionPage')"><i class="fa fa-arrow-left"></i> Back to Subject Menu</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <h3>ERGEB Educational Platform</h3>
+        <p>Empowering students through educational engagement, Presentations, modern learning systems, and innovative exam mechanisms.</p>
+    </footer>
+
+    <button class="scrollTop" id="topBtn">↑</button>
+
+    <script>
+        /* CORE STRUCTURAL MAPPING DATA STREAMS STRUCTURES */
+        const globalStreamMatrixConfigMap = {
+            "Natural Science": {
+                subjects: ["Department of Mathematics", "Department of Physics", "Department of Chemistry", "Department of Biology", "Department of English"],
+                icons: ["fa-calculator", "fa-bolt", "fa-flask", "fa-dna", "fa-language"]
+            },
+            "Social Science": {
+                subjects: ["Department of History", "Department of Geography", "Department of Economics"],
+                icons: ["fa-landmark", "fa-earth-africa", "fa-chart-pie"]
+            }
+        };
+
+        /* SESSION STATE DATA NODES MANAGEMENT CONTROLLERS */
+        let sessionSelectedStream = "";
+        let sessionSelectedGradeAndSection = "";
+        let activeTeacherRoutingTrajectoryAction = ""; 
+        let activeTeacherSelectedDepartmentScopeKey = ""; 
+
+        /* RUNTIME SECURITY CACHE: Tracks unlocked nodes during this browsing window */
+        let sessionUnlockedDepartments = {};
+
+        /* LOCALSTORAGE REGISTRIES WITH SECURITY REGISTRIES */
+        let globalRegistryDepartmentUniquePasswords = JSON.parse(localStorage.getItem("ERGEB_SYS_DEPT_PASSWORDS")) || {};
+        let globalRegistryMissedQuestionsMatrixDatabase = JSON.parse(localStorage.getItem("ERGEB_SYS_MISSED_MATRIX")) || {};
+        let globalRegistryTransmittedStudentCorrectionPackets = JSON.parse(localStorage.getItem("ERGEB_SYS_CORRECTIONS_FEED")) || [];
+        let globalRegistryStudentProfilePasswords = JSON.parse(localStorage.getItem("ERGEB_SYS_STUDENT_PASSWORDS")) || {};
+
+        /* THE POPUP-REPLACEMENT ENGINE USING PROMISES */
+        function triggerCustomPasswordPageModal(title, textPlaceholder) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById("customPasswordVerificationPageModal");
+                const heading = document.getElementById("customPasswordModalHeaderTitle");
+                const text = document.getElementById("customPasswordModalSubtextDescription");
+                const input = document.getElementById("customPasswordModalInputField");
+                const submitBtn = document.getElementById("customPasswordModalSubmitBtn");
+                const cancelBtn = document.getElementById("customPasswordModalCancelBtn");
+
+                heading.innerText = title;
+                text.innerText = textPlaceholder;
+                input.value = "";
+                modal.style.display = "flex";
+                input.focus();
+
+                function cleanListeners() {
+                    submitBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    input.onkeydown = null;
+                }
+
+                submitBtn.onclick = () => {
+                    modal.style.display = "none";
+                    const value = input.value;
+                    cleanListeners();
+                    resolve(value);
+                };
+
+                cancelBtn.onclick = () => {
+                    modal.style.display = "none";
+                    cleanListeners();
+                    resolve(null);
+                };
+
+                input.onkeydown = (e) => {
+                    if (e.key === "Enter") {
+                        submitBtn.click();
+                    }
+                };
+            });
+        }
+
+        /* VIEW DISPLAY NAVIGATION HANDLING DRIVER PROTOCOLS */
+        function switchAppStageView(targetPageElementId) {
+            document.querySelectorAll(".app-page").forEach(page => page.classList.remove("active"));
+            const activePageNode = document.getElementById(targetPageElementId);
+            if (activePageNode) activePageNode.classList.add("active");
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetToHome() {
+            sessionSelectedStream = "";
+            sessionSelectedGradeAndSection = "";
+            switchAppStageView("pageStreamSelection");
+        }
+
+        /* STRUCTURAL ROUTING WORKFLOW CHANNELS */
+        function selectStreamNode(streamValue) {
+            sessionSelectedStream = streamValue;
+            document.getElementById("gradeBreadcrumb").innerText = `Stream: ${sessionSelectedStream}`;
+            switchAppStageView("pageGradeSelection");
+        }
+
+        function selectGradeAndSectionNode(gradeSectionValue) {
+            sessionSelectedGradeAndSection = gradeSectionValue;
+            document.getElementById("viewBreadcrumb").innerText = `Stream: ${sessionSelectedStream} | Track: ${sessionSelectedGradeAndSection}`;
+            switchAppStageView("pageViewSelection");
+        }
+
+        function routeToTargetTerminalGateway(targetRoleToken) {
+            if (targetRoleToken === 'STUDENT') {
+                document.getElementById("studentWorkspaceBreadcrumb").innerText = `Scope: ${sessionSelectedStream} (${sessionSelectedGradeAndSection}) > Student Desktop`;
+                document.getElementById("inputStudentPortalTraceNameKey").value = "";
+                document.getElementById("studentPersonalizedDashboardWorkspaceFrame").style.display = "none";
+                
+                const selectNode = document.getElementById("inputStudentSubmissionTargetDeptSelectNode");
+                selectNode.innerHTML = "";
+                const streamData = globalStreamMatrixConfigMap[sessionSelectedStream];
+                if(streamData && streamData.subjects) {
+                    streamData.subjects.forEach(subj => {
+                        const opt = document.createElement("option");
+                        opt.value = subj;
+                        opt.innerText = subj;
+                        selectNode.appendChild(opt);
+                    });
+                }
+                switchAppStageView("studentMainTerminalWorkspacePage");
+            } else if (targetRoleToken === 'TEACHER') {
+                document.getElementById("teacherGateBreadcrumb").innerText = `Scope: ${sessionSelectedStream} (${sessionSelectedGradeAndSection}) > Instructor Desk`;
+                renderDynamicTeacherSubjectGateGridSelection();
+                switchAppStageView("teacherDepartmentGatePage");
+            }
+        }
+
+        /* DYNAMIC RENDER PROTOCOLS FOR THE TEACHER PANEL */
+        function renderDynamicTeacherSubjectGateGridSelection() {
+            const container = document.getElementById("teacherDeptSelectionGridContainer");
+            const dropdownSelect = document.getElementById("adminPasswordChangeTargetSubjectSelect");
+            container.innerHTML = "";
+            dropdownSelect.innerHTML = "";
+
+            const targetStreamObj = globalStreamMatrixConfigMap[sessionSelectedStream];
+            if (!targetStreamObj) return;
+
+            targetStreamObj.subjects.forEach((subjectName, index) => {
+                const uniqueGlobalStorageScopeKey = `${sessionSelectedStream}_${sessionSelectedGradeAndSection}_${subjectName}`;
+                
+                const optionElement = document.createElement("option");
+                optionElement.value = uniqueGlobalStorageScopeKey;
+                optionElement.innerText = subjectName;
+                dropdownSelect.appendChild(optionElement);
+
+                const cardIconClass = targetStreamObj.icons[index] || "fa-book-open";
+                const cardHtmlNode = document.createElement("div");
+                cardHtmlNode.className = "interactive-card";
+                cardHtmlNode.onclick = () => authenticateAndEnterTeacherSubjectDashboardConsole(uniqueGlobalStorageScopeKey, subjectName);
+                
+                const hasPassword = globalRegistryDepartmentUniquePasswords[uniqueGlobalStorageScopeKey] ? true : false;
+                const statusSubtext = hasPassword ? 
+                    `<span style="color:#ffcc00;"><i class="fa fa-lock"></i> Password Protected</span>` : 
+                    `<span style="color:#dc3545; font-weight:bold;"><i class="fa fa-plus-circle"></i> Password Not Set Yet</span>`;
+
+                cardHtmlNode.innerHTML = `
+                    <i class="fa ${cardIconClass}"></i>
+                    <h3>${subjectName}</h3>
+                    <p style="font-size:12px; color:gray; margin-top:5px;">${statusSubtext}</p>
+                `;
+                container.appendChild(cardHtmlNode);
+            });
+        }
+
+        /* FIXED LOGIC ENGINE: First visit sets password, subsequent visits require it */
+        async function authenticateAndEnterTeacherSubjectDashboardConsole(storageScopeKey, rawSubjectTitle) {
+            let existingPassword = globalRegistryDepartmentUniquePasswords[storageScopeKey];
+            
+            // 1. FIRST TIME: If no password exists in memory grid yet, make them set one
+            if (!existingPassword) {
+                const newPasswordSetup = await triggerCustomPasswordPageModal(
+                    `Initial Security Setup`, 
+                    `No password has been configured for ${rawSubjectTitle}. Create a secure password for this department now:`
+                );
+
+                if (!newPasswordSetup || newPasswordSetup.trim() === "") {
+                    alert("Setup Cancelled: A department cannot be opened without a password setup registry.");
+                    return;
+                }
+
+                // Save it to memory
+                globalRegistryDepartmentUniquePasswords[storageScopeKey] = newPasswordSetup.trim();
+                localStorage.setItem("ERGEB_SYS_DEPT_PASSWORDS", JSON.stringify(globalRegistryDepartmentUniquePasswords));
+                
+                alert(`Password established successfully for ${rawSubjectTitle}!`);
+                renderDynamicTeacherSubjectGateGridSelection(); // refresh view badges
+                launchTeacherSubjectWorkspaceDashboard(storageScopeKey, rawSubjectTitle);
+                return;
+            }
+
+            // 2. SECOND TIME onwards: Require the password they set initially
+            const enteredToken = await triggerCustomPasswordPageModal(
+                `Department Login Challenge`, 
+                `Enter the verification password you configured for: ${rawSubjectTitle}`
+            );
+
+            if (enteredToken === null) return; // Cancel hit
+
+            if (enteredToken === existingPassword) {
+                launchTeacherSubjectWorkspaceDashboard(storageScopeKey, rawSubjectTitle);
+            } else {
+                alert("ACCESS DENIED: Authentication credentials invalid for this department profile node.");
+            }
+        }
+
+        /* Helper to prepare views cleanly */
+        function launchTeacherSubjectWorkspaceDashboard(storageScopeKey, rawSubjectTitle) {
+            activeTeacherSelectedDepartmentScopeKey = storageScopeKey;
+            document.getElementById("activeSubjectPanelScopeBadge").innerText = `${rawSubjectTitle} (${sessionSelectedGradeAndSection})`;
+            document.querySelectorAll(".activeMissedTargetLabelDeptBadgeClass").forEach(b => b.innerText = `${rawSubjectTitle} [${sessionSelectedGradeAndSection}]`);
+            document.querySelectorAll(".activeEngagementTargetLabelDeptBadgeClass").forEach(b => b.innerText = `${rawSubjectTitle} [${sessionSelectedGradeAndSection}]`);
+            
+            switchAppStageView("teacherActionSelectionPage");
+        }
+
+        function routeTeacherTrajectoryAction(actionToken) {
+            activeTeacherRoutingTrajectoryAction = actionToken;
+            if (actionToken === 'MANAGE_MISSED') {
+                document.getElementById("inputTeacherConfigStudentName").value = "";
+                document.getElementById("inputTeacherConfigMissedQuestionsCsv").value = "";
+                switchAppStageView("teacherManageMissedActionTerminalPage");
+            } else if (actionToken === 'SEE_ENGAGEMENT') {
+                syncTeacherLiveEngagementIncomingFeedsTable();
+                switchAppStageView("teacherSeeEngagementActionTerminalPage");
+            }
+        }
+
+        function commitNewMissingQuestionRulesetEntry() {
+            const studentRawName = document.getElementById("inputTeacherConfigStudentName").value.trim();
+            const rawCsv = document.getElementById("inputTeacherConfigMissedQuestionsCsv").value.trim();
+
+            if (!studentRawName || !rawCsv) {
+                alert("Processing Fault: Input fields cannot hold empty variables.");
+                return;
+            }
+
+            const parsedQuestionArrayNumbers = rawCsv.split(",")
+                .map(item => parseInt(item.trim()))
+                .filter(num => !isNaN(num));
+
+            const uniqueStudentScopeRegistryId = `${sessionSelectedStream}_${sessionSelectedGradeAndSection}_${studentRawName.toLowerCase()}`;
+            
+            if (!globalRegistryMissedQuestionsMatrixDatabase[uniqueStudentScopeRegistryId]) {
+                globalRegistryMissedQuestionsMatrixDatabase[uniqueStudentScopeRegistryId] = {};
+            }
+
+            globalRegistryMissedQuestionsMatrixDatabase[uniqueStudentScopeRegistryId][activeTeacherSelectedDepartmentScopeKey] = parsedQuestionArrayNumbers;
+            localStorage.setItem("ERGEB_SYS_MISSED_MATRIX", JSON.stringify(globalRegistryMissedQuestionsMatrixDatabase));
+
+            alert(`Successfully added constraints rows parameters for ${studentRawName}!`);
+            document.getElementById("inputTeacherConfigStudentName").value = "";
+            document.getElementById("inputTeacherConfigMissedQuestionsCsv").value = "";
+        }
+
+        function syncTeacherLiveEngagementIncomingFeedsTable() {
+            const tableBody = document.getElementById("liveTeacherEngagementLogsTableTableBodyFeed");
+            tableBody.innerHTML = "";
+
+            const filteredCollectionPackets = globalRegistryTransmittedStudentCorrectionPackets.filter(packet => {
+                return packet.stream === sessionSelectedStream && 
+                       packet.gradeSection === sessionSelectedGradeAndSection && 
+                       packet.departmentScopeKey === activeTeacherSelectedDepartmentScopeKey;
+            });
+
+            if (filteredCollectionPackets.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; font-style:italic;">No peer evaluation correction packets received from active student pipelines yet.</td></tr>`;
+                return;
+            }
+
+            filteredCollectionPackets.forEach(packet => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="font-weight:bold; color:#0055aa;">${packet.studentName}</td>
+                    <td><span style="background:#dc3545; color:white; padding:2px 8px; border-radius:4px; font-size:12px;">Q# ${packet.questionId}</span></td>
+                    <td style="font-family:monospace; background:rgba(0,0,0,0.02); white-space:pre-wrap;">${packet.solutionScript}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function executeAdminPasswordOverrideUpdate() {
+            const targetedScopeKey = document.getElementById("adminPasswordChangeTargetSubjectSelect").value;
+            const currentOldPasswordInput = document.getElementById("adminPasswordOldKeyToken").value;
+            const customNewPasswordInput = document.getElementById("adminPasswordNewKeyToken").value;
+
+            if (!currentOldPasswordInput || !customNewPasswordInput) {
+                alert("Validation Exception: Fields cannot pass empty parameters values strings.");
+                return;
+            }
+
+            const actualRegisteredOldPasswordValue = globalRegistryDepartmentUniquePasswords[targetedScopeKey];
+
+            if (!actualRegisteredOldPasswordValue) {
+                alert("Aborted: Cannot change a password that has never been set. Click the department card first to establish an original password key.");
+                return;
+            }
+
+            if (currentOldPasswordInput === actualRegisteredOldPasswordValue) {
+                globalRegistryDepartmentUniquePasswords[targetedScopeKey] = customNewPasswordInput;
+                localStorage.setItem("ERGEB_SYS_DEPT_PASSWORDS", JSON.stringify(globalRegistryDepartmentUniquePasswords));
+                alert("Security Credentials Modification Complete: New protection token assigned safely.");
+                document.getElementById("adminPasswordOldKeyToken").value = "";
+                document.getElementById("adminPasswordNewKeyToken").value = "";
+                renderDynamicTeacherSubjectGateGridSelection();
+            } else {
+                alert("Security Override Aborted: Current master verification file credential mismatch.");
+            }
+        }
+
+        /* STUDENT SECURITY LOGINS RUN ON CUSTOM PAGE MODAL OVERLAYS */
+        async function executeStudentRegistryLookupPipeline() {
+            const studentNameInputField = document.getElementById("inputStudentPortalTraceNameKey");
+            const rawStudentNameValue = studentNameInputField.value.trim();
+
+            if (!rawStudentNameValue) {
+                alert("Routing Fault: System registry pipeline tracking requires a student target identity name key.");
+                return;
+            }
+
+            const normalizedGlobalProfileStudentStorageKeyId = `${sessionSelectedStream}_${sessionSelectedGradeAndSection}_${rawStudentNameValue.toLowerCase()}`;
+            let assignedStudentPasswordToken = globalRegistryStudentProfilePasswords[normalizedGlobalProfileStudentStorageKeyId];
+
+            if (!assignedStudentPasswordToken) {
+                const initialPasswordSetupSelection = await triggerCustomPasswordPageModal(
+                    `New Student Registration`, 
+                    `No active workspace found for "${rawStudentNameValue}". Establish a new dynamic security password:`
+                );
+
+                if (!initialPasswordSetupSelection) {
+                    alert("Registration Aborted.");
+                    return;
+                }
+
+                globalRegistryStudentProfilePasswords[normalizedGlobalProfileStudentStorageKeyId] = initialPasswordSetupSelection;
+                localStorage.setItem("ERGEB_SYS_STUDENT_PASSWORDS", JSON.stringify(globalRegistryStudentProfilePasswords));
+                assignedStudentPasswordToken = initialPasswordSetupSelection;
+            } else {
+                const verificationAttemptToken = await triggerCustomPasswordPageModal(
+                    `Student Login Node`, 
+                    `Enter personal passkey variables configured for: ${rawStudentNameValue}`
+                );
+
+                if (verificationAttemptToken === null) return;
+
+                if (verificationAttemptToken !== assignedStudentPasswordToken) {
+                    alert("Authentication Security Refusal: Identity verification string index logic claims mismatched data arrays entry.");
+                    return;
+                }
+            }
+
+            document.getElementById("studentGreetingProfileLabel").innerHTML = `<i class="fa fa-user-circle" style="color:#28a745;"></i> Active Student Profile Session: <span style="color:#0055aa;">${rawStudentNameValue}</span>`;
+            document.getElementById("studentPersonalizedDashboardWorkspaceFrame").style.display = "block";
+
+            renderPersonalizedStudentTasksDashboardCollections(rawStudentNameValue);
+        }
+
+        function renderPersonalizedStudentTasksDashboardCollections(studentNameString) {
+            const tasksContainer = document.getElementById("studentPortalDynamicMissedTasksCollectionFeedList");
+            const historyLogContainer = document.getElementById("studentHistoricalEngagementLogTraceView");
+            
+            tasksContainer.innerHTML = "";
+            historyLogContainer.innerHTML = "";
+
+            const targetRegistrySearchProfileKey = `${sessionSelectedStream}_${sessionSelectedGradeAndSection}_${studentNameString.toLowerCase()}`;
+            const studentBoundMissedDatabaseObjectsGroup = globalRegistryMissedQuestionsMatrixDatabase[targetRegistrySearchProfileKey] || {};
+
+            let dynamicHasTrackedTasksToDisplay = false;
+
+            for (const [deptScopeStorageKey, missedQuestionsNumbersArray] of Object.entries(studentBoundMissedDatabaseObjectsGroup)) {
+                if (missedQuestionsNumbersArray && missedQuestionsNumbersArray.length > 0) {
+                    dynamicHasTrackedTasksToDisplay = true;
+                    
+                    const extractedDepartmentCleanTitle = deptScopeStorageKey.split("_")[2] || "General Department Node Branch";
+                    const deptSectionBlockNodeWrapper = document.createElement("div");
+                    deptSectionBlockNodeWrapper.style.marginBottom = "15px";
+                    deptSectionBlockNodeWrapper.innerHTML = `
+                        <h5 style="color:#003366; font-size:14px; font-weight:bold; margin-bottom:5px;"><i class="fa fa-folder-open"></i> ${extractedDepartmentCleanTitle}</h5>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            ${missedQuestionsNumbersArray.map(num => `<span class="history-item" style="display:inline-block; margin-bottom:0; font-weight:600; color:#dc3545;">Question Ref #${num}</span>`).join("")}
+                        </div>
+                    `;
+                    tasksContainer.appendChild(deptSectionBlockNodeWrapper);
+                }
+            }
+
+            if (!dynamicHasTrackedTasksToDisplay) {
+                tasksContainer.innerHTML = `<p style="color:gray; font-style:italic; font-size:13px;">Excellent matrix record! You possess zero flagged outstanding miss tasks parameters values maps files.</p>`;
+            }
+
+            const filteredHistoryItems = globalRegistryTransmittedStudentCorrectionPackets.filter(packet => {
+                return packet.stream === sessionSelectedStream && 
+                       packet.gradeSection === sessionSelectedGradeAndSection && 
+                       packet.studentName.toLowerCase() === studentNameString.toLowerCase();
+            });
+
+            if (filteredHistoryItems.length === 0) {
+                historyLogContainer.innerHTML = `<p style="color:gray; font-style:italic; font-size:13px;">No past transmission logs found for this context window trace parameters.</p>`;
+            } else {
+                filteredHistoryItems.forEach(packet => {
+                    const cleanDeptName = packet.departmentScopeKey.split("_")[2] || "Subject Scope";
+                    const logItemNode = document.createElement("div");
+                    logItemNode.className = "history-item";
+                    logItemNode.innerHTML = `
+                        <strong>Subject:</strong> ${cleanDeptName} | <strong>QID:</strong> ${packet.questionId}<br>
+                        <span style="font-size:12px; color:gray;">Content Solution Script Trace Data Row:</span>
+                        <pre style="font-family:monospace; margin-top:4px; white-space:pre-wrap; font-size:12px; opacity:0.9;">${packet.solutionScript}</pre>
+                    `;
+                    historyLogContainer.appendChild(logItemNode);
+                });
+            }
+        }
+
+        function dispatchStudentCorrectionPacketToTeacherHub() {
+            const studentInputNameFieldRef = document.getElementById("inputStudentPortalTraceNameKey");
+            const activeDashboardProfileResolvedStudentName = studentInputNameFieldRef.value.trim();
+
+            const targetDepartmentSelectionSelectorRef = document.getElementById("inputStudentSubmissionTargetDeptSelectNode").value;
+            const inputTargetQuestionIdentificationIndexRefId = document.getElementById("inputStudentSubmissionTargetQuestionRefNum").value.trim();
+            const textareaBodyVerificationScriptTextContentRows = document.getElementById("inputStudentSubmissionSolutionTextareaBody").value.trim();
+
+            if (!inputTargetQuestionIdentificationIndexRefId || !textareaBodyVerificationScriptTextContentRows) {
+                alert("Pipeline Interruption: Execution requires verified Question Reference ID matrices maps and operational text strings scripts body variables context.");
+                return;
+            }
+
+            const formattedTargetDepartmentConstructScopeKeyId = `${sessionSelectedStream}_${sessionSelectedGradeAndSection}_${targetDepartmentSelectionSelectorRef}`;
+
+            const activeFormedCorrectionPacketObjectUnit = {
+                studentName: activeDashboardProfileResolvedStudentName,
+                stream: sessionSelectedStream,
+                gradeSection: sessionSelectedGradeAndSection,
+                departmentScopeKey: formattedTargetDepartmentConstructScopeKeyId,
+                questionId: inputTargetQuestionIdentificationIndexRefId,
+                solutionScript: textareaBodyVerificationScriptTextContentRows,
+                timestampIndexMillisSignature: Date.now()
+            };
+
+            globalRegistryTransmittedStudentCorrectionPackets.push(activeFormedCorrectionPacketObjectUnit);
+            localStorage.setItem("ERGEB_SYS_CORRECTIONS_FEED", JSON.stringify(globalRegistryTransmittedStudentCorrectionPackets));
+
+            alert("Transmission Complete: Validation context packets dropped directly inside secure teacher pipeline directories indices.");
+
+            document.getElementById("inputStudentSubmissionTargetQuestionRefNum").value = "";
+            document.getElementById("inputStudentSubmissionSolutionTextareaBody").value = "";
+
+            renderPersonalizedStudentTasksDashboardCollections(activeDashboardProfileResolvedStudentName);
+        }
+
+        /* DARK MODE LOGIC SWITCH ENGINE */
+        const modeBtn = document.getElementById("modeBtn");
+        modeBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            if (document.body.classList.contains("dark-mode")) {
+                modeBtn.innerHTML = "☀️ Light Mode";
+            } else {
+                modeBtn.innerHTML = "🌙 Dark Mode";
+            }
+        });
+
+        /* SCROLL TOP SYSTEM ACTION BUTTONS */
+        const topBtn = document.getElementById("topBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                topBtn.style.display = "block";
+            } else {
+                topBtn.style.display = "none";
+            }
+        };
+        topBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

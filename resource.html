@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethiopian Student Hub - Kehulum Learning Dashboard</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* CSS DESIGN SYSTEM VARIABLES */
+        :root {
+            --primary: #003366;
+            --primary-light: #0055aa;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --dark: #1f2937;
+            --light: #f4f4f4;
+            --white: #ffffff;
+            --youtube: #ef4444;
+            --recom-header: #4b5563;
+        }
+
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--light);
+            color: #222;
+            transition: 0.4s;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* DARK MODE GLOBAL STYLES */
+        .dark-mode {
+            background: #121212;
+            color: white;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 20px;
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: slideDown 1s ease;
+            text-align: center;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* LOGO */
+        .logo {
+            width: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 38px;
+            margin-top: 10px;
+            text-shadow: 2px 2px 5px black;
+        }
+
+        header p {
+            font-size: 18px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* NAVIGATION BAR */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        nav a, nav button {
+            text-decoration: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: 0.4s;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        nav a:hover, nav button:hover {
+            background: white;
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* BACK BUTTON SPECIAL HOVER */
+        nav button.back-btn-nav:hover {
+            background: var(--accent);
+            color: var(--dark);
+        }
+
+        /* DARK MODE BUTTON */
+        #modeBtn {
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: white;
+            color: var(--primary);
+            transition: 0.4s;
+        }
+
+        #modeBtn:hover {
+            background: black;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* CONTAINER STYLES */
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            margin: auto;
+            padding: 40px 20px;
+            flex-grow: 1;
+        }
+
+        /* INITIAL GRADE SELECTOR SCREEN */
+        body.selector-mode {
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #grade-selector-screen {
+            background-color: var(--white);
+            max-width: 550px;
+            width: 100%;
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-top: 6px solid var(--primary);
+            animation: fadeIn 1.5s ease;
+        }
+
+        .dark-mode #grade-selector-screen {
+            background-color: #1e1e1e;
+            border-top-color: var(--primary-light);
+        }
+
+        #grade-selector-screen h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dark-mode #grade-selector-screen h1 {
+            color: var(--primary-light);
+        }
+
+        #grade-selector-screen p {
+            color: #4b5563;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dark-mode #grade-selector-screen p {
+            color: #ccc;
+        }
+
+        /* STEP DISPLAY IMPLEMENTATION */
+        .step-container {
+            text-align: left;
+            margin-bottom: 1.5rem;
+            padding: 12px 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .dark-mode .step-container {
+            background-color: #252525;
+        }
+
+        .step-badge {
+            display: inline-block;
+            background-color: var(--accent);
+            color: #111;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: var(--dark);
+        }
+
+        .dark-mode .step-title {
+            color: #fff;
+        }
+
+        .grade-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .grade-option {
+            background-color: #f9fafb;
+            color: #222;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dark-mode .grade-option {
+            background-color: #2d2d2d;
+            color: white;
+            border-color: #444;
+        }
+
+        .grade-option:hover {
+            border-color: var(--primary-light);
+            background-color: #eff6ff;
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .dark-mode .grade-option:hover {
+            border-color: var(--primary-light);
+            background-color: #1a2e40;
+            color: var(--primary-light);
+        }
+
+        .grade-option::after {
+            content: "➔";
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        /* GRID SYSTEM & SPACING PRESERVATION */
+        .grid-two-col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 15px; 
+            margin-bottom: 45px;
+        }
+
+        /* CARD CONTAINERS DESIGN */
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .dark-mode .card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Styling */
+        .card-header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1.25rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header.social { background-color: var(--secondary); }
+        .card-header.recom { background-color: var(--recom-header); }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-body p {
+            margin-bottom: 1rem;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        .dark-mode .card-body p {
+            color: #cbd5e0;
+        }
+
+        /* LIST PANELS */
+        .subject-list, .recom-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .subject-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s, padding-left 0.2s;
+            border-radius: 4px;
+        }
+
+        .dark-mode .subject-list li {
+            border-bottom-color: #2d2d2d;
+        }
+
+        .subject-list li:hover {
+            background-color: #eff6ff;
+            padding-left: 8px;
+            color: var(--primary-light);
+        }
+
+        .dark-mode .subject-list li:hover {
+            background-color: #252525;
+            color: var(--primary-light);
+        }
+
+        .subject-list li::before {
+            content: "🎓";
+            margin-right: 10px;
+            font-size: 0.85rem;
+        }
+
+        .recom-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark-mode .recom-list li {
+            border-bottom-color: #2d2d2d;
+        }
+
+        .recom-list li::before {
+            content: "➔";
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* ACTION BUTTONS */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: auto;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover { background-color: #1d4ed8; }
+        .btn.secondary-btn { background-color: var(--secondary); }
+        .btn.secondary-btn:hover { background-color: #059669; }
+        .btn.accent-btn { background-color: var(--accent); color: var(--dark); }
+        .btn.accent-btn:hover { background-color: #d97706; color: var(--white); }
+        .btn.yt-btn { background-color: var(--youtube); }
+        .btn.yt-btn:hover { background-color: #dc2626; }
+
+        .selected-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .dark-mode .selected-badge {
+            background: #1a2e40;
+            color: var(--primary-light);
+        }
+
+        /* STRATEGY BANNER */
+        .info-banner {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary-light);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 2.5rem;
+        }
+
+        .dark-mode .info-banner {
+            background-color: #1e1e1e;
+            border-left-color: var(--primary-light);
+        }
+
+        .info-banner h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .dark-mode .info-banner h3 {
+            color: var(--primary-light);
+        }
+
+        .video-box {
+            background: var(--white);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dark-mode .video-box {
+            background: #252525;
+            border-color: #333;
+        }
+
+        /* INTUITIVE CLICKABLE ICON HOVER EFFECT */
+        .clickable-icon-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: inherit;
+            transition: transform 0.2s ease;
+        }
+        
+        .clickable-icon-link:hover {
+            transform: scale(1.03);
+        }
+
+        .youtube-large-icon {
+            color: var(--youtube);
+            font-size: 3rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .youtube-large-icon:hover {
+            color: #dc2626;
+            transform: scale(1.1);
+        }
+
+        /* SCROLL TOP BUTTON */
+        .scrollTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+            transition: 0.4s;
+            z-index: 999;
+        }
+
+        .scrollTop:hover {
+            background: #10b981;
+            transform: scale(1.1);
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: var(--dark);
+            color: var(--white);
+            text-align: center;
+            padding: 1.5rem 1rem;
+            margin-top: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* RESPONSIVE LAYOUT BREAKPOINTS */
+        @media(max-width: 768px) {
+            header h1 {
+                font-size: 30px;
+            }
+            nav {
+                flex-direction: column;
+            }
+            .grid-two-col {
+                grid-template-columns: 1fr;
+            }
+            .video-box {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="selector-mode">
+
+    <div id="grade-selector-screen">
+        <h1>Welcome, Student!</h1>
+        <p>Follow the simple tracking options to configure your custom Kehulum Learning Hub portal.</p>
+        
+        <!-- STEP ONE DISPLAY -->
+        <div class="step-container">
+            <span class="step-badge">Step One</span>
+            <div class="step-title">Select Your Academic Grade Level</div>
+        </div>
+
+        <div class="grade-menu">
+            <button class="grade-option" onclick="selectGradeAndProceed(9)">Grade 9</button>
+            <button class="grade-option" onclick="selectGradeAndProceed(10)">Grade 10</button>
+            <button class="grade-option" onclick="selectGradeAndProceed(11)">Grade 11</button>
+            <button class="grade-option" onclick="selectGradeAndProceed(12)">Grade 12</button>
+        </div>
+
+        <!-- STEP TWO DISPLAY -->
+        <div class="step-container" style="margin-top: 2rem; border-left-color: var(--secondary);">
+            <span class="step-badge" style="background-color: var(--secondary); color: white;">Step Two</span>
+            <div class="step-title" style="font-size: 0.95rem; font-weight: normal; opacity: 0.85;">
+                Choose specific subject units inside the panel to isolate curriculum texts, interactive study playlists, and cloud worksheet assets.
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app-content" style="display: none; width: 100%; animation: fadeIn 1s ease;">
+        
+        <header>
+            <img src="OIP (1).webp" class="logo">
+            <h1 id="main-heading">Ethiopian Grade Learning Hub</h1>
+            <p id="sub-heading">Select a subject below to link directly to Kehulum textbook PDFs, offline applications, and study material networks.</p>
+            
+            <nav>
+                <button onclick="returnToGradeSelection()" class="back-btn-nav"><i class="fa fa-arrow-left"></i> Change Grade</button>
+                <a href="index.html"><i class="fa fa-home"></i> Home</a>
+                <a href="exam.html"><i class="fa fa-book"></i> Exam</a>
+                <a href="resource.html"><i class="fa fa-star"></i> Resource</a>
+                <a href="engagement.html"><i class="fa fa-users"></i> Engagement</a>
+                <a href="comment.html"><i class="fa fa-comments"></i> Comment</a>
+            </nav>
+
+            <button id="modeBtn">🌙 Dark Mode</button>
+        </header>
+
+        <div class="container">
+            
+            <!-- STREAM TRACK SELECTION -->
+            <div class="grid-two-col">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-flask"></i> <span id="nat-card-title">Natural Sciences</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Click a subject to find books on Kehulum:</p>
+                        <ul class="subject-list" id="nat-subject-list">
+                        </ul>
+                        <a href="https://kehulum.com" id="nat-hub-btn" target="_blank" class="btn">Go to Kehulum Library</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header social">
+                        <i class="fa fa-earth-africa"></i> <span id="soc-card-title">Social Sciences</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Click a subject to find books on Kehulum:</p>
+                        <ul class="subject-list" id="soc-subject-list">
+                        </ul>
+                        <a href="https://kehulum.com" id="soc-hub-btn" target="_blank" class="btn secondary-btn">Go to Kehulum Library</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECONDARY UTILITIES (TELEGRAM REMOVED) -->
+            <div class="grid-two-col">
+                <div class="card">
+                    <div class="card-header recom">
+                        <i class="fa fa-book-open"></i> <span>Kehulum PDF Vault</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="badge-hub" class="selected-badge">Status: Ready</div>
+                        <p id="text-hub">Download current curriculum textbooks immediately from Kehulum's direct learning catalog.</p>
+                        <ul class="recom-list" id="list-hub">
+                        </ul>
+                        <a href="https://kehulum.com" id="link-hub" target="_blank" class="btn accent-btn">Open PDF on Kehulum</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header recom">
+                        <i class="fa fa-mobile-screen-button"></i> <span>Reference Mobile Apps</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="badge-app" class="selected-badge">Level: Targeted</div>
+                        <p id="text-app">Locate phone apps featuring specialized solution books such as Extreme Series or Alpha Guides.</p>
+                        <ul class="recom-list" id="list-app">
+                        </ul>
+                        <a href="https://play.google.com/store/apps/details?id=com.binaryabyssinia.ethio_books_all_grades_textbooks" id="link-app" target="_blank" class="btn secondary-btn">Find Targeted Apps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-banner">
+                <h3><i class="fa fa-lightbulb"></i> Active Study Strategy</h3>
+                <p id="strategy-text">Select any textbook subject item above to view dedicated, highly-focused processing methods here.</p>
+                
+                <!-- CLICKABLE ICON CONTAINER -->
+                <div class="video-box">
+                    <a id="video-link" class="clickable-icon-link" href="https://www.youtube.com" target="_blank">
+                        <i class="fa-solid fa-square-youtube youtube-large-icon"></i>
+                        <div>
+                            <span style="display: block; font-weight: bold; font-size: 1.1rem; color: #1f2937;" id="video-title-text">YouTube Lessons</span>
+                            <span id="video-desc" style="color: #4b5563; font-size: 0.95rem;">Click this icon to load related channel playlists.</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p id="footer-text">Ethiopian Resource Hub • Kehulum Direct Textbook Link Center Layout</p>
+        </footer>
+    </div>
+
+    <button class="scrollTop" id="topBtn">↑</button>
+
+    <script>
+
+let globalSelectedGrade = 9;
+
+/* DARK MODE */
+const modeBtn = document.getElementById("modeBtn");
+modeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    modeBtn.innerHTML = document.body.classList.contains("dark-mode")
+        ? "☀️ Light Mode"
+        : "🌙 Dark Mode";
+});
+
+/* SCROLL TOP */
+const topBtn = document.getElementById("topBtn");
+
+window.addEventListener("scroll", () => {
+    topBtn.style.display = window.scrollY > 300 ? "block" : "none";
+});
+
+topBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* SELECT GRADE */
+function selectGradeAndProceed(gradeNum) {
+    globalSelectedGrade = gradeNum;
+
+    document.getElementById('main-heading').innerText =
+        "Ethiopian Grade " + gradeNum + " Learning Hub";
+
+    document.getElementById('sub-heading').innerText =
+        "Access textbooks, apps, and YouTube lessons.";
+
+    document.getElementById('nat-card-title').innerText =
+        "Natural Sciences (Grade " + gradeNum + ")";
+
+    document.getElementById('soc-card-title').innerText =
+        "Social Sciences (Grade " + gradeNum + ")";
+
+    document.getElementById('nat-hub-btn').href =
+        "https://kehulum.com/student-textbook/new/grade-" + gradeNum;
+
+    document.getElementById('soc-hub-btn').href =
+        "https://kehulum.com/student-textbook/new/grade-" + gradeNum;
+
+    populateSubjectLists();
+    resetDashboard();
+
+    document.getElementById('grade-selector-screen').style.display = "none";
+    document.getElementById('main-app-content').style.display = "block";
+}
+
+/* BACK */
+function returnToGradeSelection() {
+    document.getElementById('main-app-content').style.display = "none";
+    document.getElementById('grade-selector-screen').style.display = "block";
+}
+
+/* SUBJECT LIST */
+function populateSubjectLists() {
+    document.getElementById('nat-subject-list').innerHTML = `
+        <li onclick="updateTopic('Mathematics')">Mathematics</li>
+        <li onclick="updateTopic('Physics')">Physics</li>
+        <li onclick="updateTopic('Chemistry')">Chemistry</li>
+        <li onclick="updateTopic('Biology')">Biology</li>
+        <li onclick="updateTopic('IT')">IT</li>
+    `;
+
+    document.getElementById('soc-subject-list').innerHTML = `
+        <li onclick="updateTopic('History')">History</li>
+        <li onclick="updateTopic('Geography')">Geography</li>
+        <li onclick="updateTopic('Economics')">Economics</li>
+        <li onclick="updateTopic('Civics')">Civics</li>
+        <li onclick="updateTopic('English')">English</li>
+    `;
+}
+
+/* RESET */
+function resetDashboard() {
+    document.getElementById('video-link').href = "https://www.youtube.com";
+    document.getElementById('video-title-text').innerText = "YouTube Lessons";
+    document.getElementById('video-desc').innerText = "Click a subject to load lessons";
+
+    document.getElementById('link-hub').href = "https://kehulum.com";
+    document.getElementById('link-app').href = "https://play.google.com";
+}
+
+/* =========================
+   TOPIC CONFIGURATION AREA
+========================= */
+function updateTopic(subjectName) {
+
+    /* ================= YOUTUBE CONFIGURATION ================= */
+    let ytQuery = `grade ${globalSelectedGrade} ${subjectName} Ethiopia lessons`;
+    document.getElementById('video-link').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ytQuery);
+    document.getElementById('video-title-text').innerText = subjectName + " Lessons";
+    document.getElementById('video-desc').innerText = "Grade " + globalSelectedGrade + " " + subjectName + " videos";
+
+    /* ================= KEHULUM PDF SYSTEM ================= */
+    document.getElementById('link-hub').href = "https://kehulum.com/student-textbook/new/grade-" + globalSelectedGrade;
+    document.getElementById('badge-hub').innerText = subjectName + " PDF Vault";
+
+    /* ================= PLAY STORE SEARCH CONFIGURATION ================= */
+    document.getElementById('link-app').href = "https://play.google.com/store/search?q=" + encodeURIComponent("grade " + globalSelectedGrade + " " + subjectName + " textbook");
+    document.getElementById('badge-app').innerText = subjectName + " Apps";
+}
+</script>
+</body>
+
+</html>

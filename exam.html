@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERGEB Educational Platform</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* RESET & GENERAL STYLES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+            transition: background 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background: #121212;
+            color: white;
+        }
+
+        /* STANDARD HEADER (Rolls away out of sight when scrolling down) */
+        header {
+            background: linear-gradient(90deg, #003366, #0055aa);
+            color: white;
+            padding: 20px;
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        body.dark-mode header {
+            background: linear-gradient(90deg, #050505, #151515);
+        }
+
+        .logo {
+            width: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 10px;
+            
+        }
+
+        
+        header h1 {
+            font-size: 38px;
+            margin-top: 10px;
+            text-shadow: 2px 2px 5px black;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav a:hover {
+            background: white;
+            color: #003366;
+            transform: translateY(-4px);
+        }
+
+        #darkBtn, .panel-toggle-btn {
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: white;
+            color: #003366;
+            transition: all 0.4s ease;
+            margin-right: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-toggle-btn {
+            background: #ffcc00;
+            color: #333;
+        }
+
+        /* CONTAINER AND APPLICATION ARCHITECTURE */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 270px auto 0 auto; 
+            padding: 40px 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* LIVE SEARCH BAR VIEW BOX */
+        .search-box {
+            margin: 20px 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background: white;
+        }
+
+        body.dark-mode .search-box input {
+            background: #2a2a2a;
+            color: white;
+            border-color: #444;
+        }
+
+        /* GRID AND RESPONSIVE CARDS SYSTEM WITH OFFLINE SMOOTH TRANSITIONS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+            /* Hardware-accelerated smooth transitions for native cross-browser interpolation */
+            transition: transform 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease;
+            position: relative;
+            
+            /* Structural starting hidden states for the runtime JavaScript trigger query */
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        body.dark-mode .card {
+            background: #1e1e1e;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* NEW FULL-SCREEN EXAM ENGINE STYLING */
+        .exam-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .pdf-full-container {
+            width: 100%;
+        }
+
+        .pdf-view-frame {
+            width: 100%;
+            height: 750px; /* Increased height for full-screen reading comfort */
+            border: 2px solid #003366;
+            border-radius: 12px;
+            margin-top: 15px;
+            background: #fff;
+        }
+
+        .pdf-wrapper-node {
+            background: #eef4fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border-left: 6px solid #0055aa;
+        }
+
+        body.dark-mode .pdf-wrapper-node {
+            background: #252525;
+            border-left-color: #ffcc00;
+        }
+
+        .questions-stacked-container {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        body.dark-mode .questions-stacked-container {
+            background: #1e1e1e;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        /* ENGAGEMENT COMMENT SECTIONS SYSTEM */
+        .comment-section-box {
+            margin-top: 40px;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        body.dark-mode .comment-section-box {
+            background: #1e1e1e;
+        }
+
+        .comment-input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comment-input-area input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .comment-list {
+            margin-top: 15px;
+            list-style: none;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        body.dark-mode .comment-item {
+            border-bottom-color: #333;
+        }
+
+        /* INTERACTIVE MATRIC QUESTION DESIGN STRUCTURE */
+        .question-box {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            background: #f9f9f9;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode .question-box {
+            background: #2a2a2a;
+        }
+
+        .question-box label {
+            display: flex;
+            align-items: center;
+            margin-top: 12px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .question-box label:hover {
+            background: rgba(0, 85, 170, 0.05);
+        }
+
+        .question-box input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, #003366, #0055aa);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #28a745;
+        }
+
+        .back-btn {
+            background: #dc3545;
+            margin-top: 30px;
+        }
+
+        .panel-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+        }
+
+        body.dark-mode .panel-box {
+            background: #1e1e1e;
+        }
+
+        .panel-box input, .panel-box select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+        }
+
+        .manage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .manage-table th, .manage-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        body.dark-mode .manage-table th, body.dark-mode .manage-table td {
+            border-color: #444;
+        }
+
+        footer {
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        /* MOBILE ADJUSTMENT FOR SCROLLING HEADER */
+        @media(max-width: 768px) {
+            header h1 { font-size: 28px; }
+            .container { margin-top: 390px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="OIP (1).webp" class="logo">
+
+        <h1>ERGEB Educational Hub</h1>
+        <nav>
+            <a href="index.html"><i class="fa fa-home"></i> Home</a>
+            <a href="exam.html"><i class="fa fa-book"></i> Exam</a>
+            <a href="resource.html"><i class="fa fa-star"></i> Resource</a>
+            <a href="engagement.html"><i class="fa fa-users"></i> Engagement</a>
+            <a href="comment.html"><i class="fa fa-comments"></i> Comment</a>
+        </nav>
+        <button id="darkBtn">🌙 Dark Mode</button>
+        <button class="panel-toggle-btn" onclick="openTeacherPanel()"><i class="fa fa-chalkboard-teacher"></i> Teacher Panel</button>
+    </header>
+
+    <section id="streamPage" class="container page active"><br><br><br>
+        <h1>Select Academic Stream</h1><br>
+        
+        <div class="search-box">
+            <input type="text" id="streamSearch" onkeyup="filterStreams()" placeholder="Search through available educational streams...">
+        </div>
+
+        <div class="grid" id="streamGrid">
+            <div class="card">
+                <img src="OIP (1)3.webp" alt="Natural Sciences">
+                <h2>Natural Science</h2>
+                <p><b>Access official tracking for biological, chemical, physical, and technical structures.</b></p>
+                <button onclick="openGradePage('Natural Science')">Open Stream</button>
+            </div>
+            <div class="card">
+                <img src="social.webp" alt="Social Sciences">
+                <h2>Social Science</h2>
+                <p><b>Explore geographic frameworks, historical archives, and economic foundations.</b></p>
+                <button onclick="openGradePage('Social Science')">Open Stream</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="gradePage" class="container page">
+        <h1 id="streamTitle"></h1><br><br>
+        <h2>Select Grade Level</h2>
+        <div class="grid">
+            <div class="card" onclick="openYearPage('Grade 9')"><h2>Grade 9</h2><button>Select</button></div>
+            <div class="card" onclick="openYearPage('Grade 10')"><h2>Grade 10</h2><button>Select</button></div>
+            <div class="card" onclick="openYearPage('Grade 11')"><h2>Grade 11</h2><button>Select</button></div>
+            <div class="card" onclick="openYearPage('Grade 12')"><h2>Grade 12</h2><button>Select</button></div>
+        </div>
+        <button class="back-btn" onclick="switchView('streamPage')"><i class="fa fa-arrow-left"></i> Back</button>
+    </section>
+
+    <section id="yearPage" class="container page"><br><br><br><br>
+        <h1 id="gradeTitle"></h1>
+        <h2>Select Examination Year</h2><br>
+        <div class="grid">
+            <div class="card" onclick="openTestPage('2016')"><h2>2016 EC</h2><button>Open</button></div>
+            <div class="card" onclick="openTestPage('2017')"><h2>2017 EC</h2><button>Open</button></div>
+            <div class="card" onclick="openTestPage('2018')"><h2>2018 EC</h2><button>Open</button></div>
+        </div>
+        <button class="back-btn" onclick="switchView('gradePage')"><i class="fa fa-arrow-left"></i> Back</button>
+    </section>
+
+    <section id="testPage" class="container page"><br><br><br><br>
+        <h1 id="yearTitle"></h1><br>
+        <h2>Select Assessment Module</h2>
+        <div class="grid">
+            <div class="card" onclick="openSubjectPage('Test One')"><h2>Test One</h2><button>View</button></div>
+            <div class="card" onclick="openSubjectPage('Test Two')"><h2>Test Two</h2><button>View</button></div>
+            <div class="card" onclick="openSubjectPage('Test Three')"><h2>Test Three</h2><button>View</button></div>
+            <div class="card" onclick="openSubjectPage('Final Exam')"><h2>Final Exam</h2><button>View</button></div>
+        </div>
+        <button class="back-btn" onclick="switchView('yearPage')"><i class="fa fa-arrow-left"></i> Back</button>
+    </section>
+
+    <section id="subjectPage" class="container page"><br><br><br><br>
+        <h1 id="testTitle"></h1><br>
+        <h2>Select Academic Subject Course</h2>
+        <div class="grid" id="subjectGrid"></div>
+        <button class="back-btn" onclick="switchView('testPage')"><i class="fa fa-arrow-left"></i> Back</button>
+    </section>
+
+    <section id="examPage" class="container page"><br><br><br><br>
+        <div style="background:#003366; color:white; padding:25px; border-radius:15px; margin-bottom:25px;">
+            <h1 id="displaySubjectTitle">Examination Desktop Terminal</h1><br>
+            <p style="margin-top:5px; opacity:0.9;">Verify data content below. Read the published PDF resource file thoroughly before tracking calculations.</p>
+        </div>
+
+        <div class="exam-layout">
+            <div class="pdf-full-container">
+                <h3 style="margin-bottom:15px; color:#003366;"><i class="fa fa-file-pdf"></i> Distributed Document Portal</h3>
+                
+                <div id="livePdfPortalContainer"></div>
+            </div>
+
+            <div class="questions-stacked-container">
+                <h3 style="color:#0055aa; border-bottom:2px solid #eee; padding-bottom:10px;"><i class="fa fa-graduation-cap"></i> Hard Matric Assessment Nodes</h3>
+                <div id="studentMatricQuestionsFeed"></div>
+                
+                <div id="quizSubmitActionBlock" style="margin-top:20px; display:none;">
+                    <button onclick="evaluateMatricPerformanceIndex()" style="width:100%; background:#28a745; padding:15px;">Submit and Evaluate Answers</button>
+                    <div id="quizScoreReportResult" style="margin-top:15px; padding:15px; border-radius:8px; display:none; font-weight:bold;"></div>
+                </div>
+            </div>
+
+            <div class="comment-section-box">
+                <h4><i class="fa fa-comments"></i> Student Peer Discussion Board</h4>
+                <div class="comment-input-area">
+                    <input type="text" id="newCommentInput" placeholder="Post a public question or diagnostic statement regarding this paper...">
+                    <button onclick="postStudentComment()">Post Comment</button>
+                </div>
+                <ul class="comment-list" id="commentListFeed"></ul>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="switchView('subjectPage')"><i class="fa fa-arrow-left"></i> Return to Course Index</button>
+    </section>
+
+    <section id="teacherPanelPage" class="container page"><br><br><br><br>
+        <h1>Teacher Exam Management Backend Panel</h1><br>
+        <p style="opacity:0.7; margin-bottom:20px;">Upload documents and build assessment nodes into the dynamic platform routing arrays.</p>
+
+        <div class="panel-box" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h3>Target Path Allocation Setup</h3>
+            <label>Stream Connection:
+                <select id="insStream" onchange="syncPanelCourseDropdown()">
+                    <option value="Natural Science">Natural Science</option>
+                    <option value="Social Science">Social Science</option>
+                </select>
+            </label>
+            <label>Grade Assignment:
+                <select id="insGrade">
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11" selected>Grade 11</option>
+                    <option value="Grade 12">Grade 12</option>
+                </select>
+            </label>
+            <label>Target Year Matrix:
+                <select id="insYear">
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018" selected>2018</option>
+                </select>
+            </label>
+            <label>Evaluation Segment:
+                <select id="insTest">
+                    <option value="Test One">Test One</option>
+                    <option value="Test Two">Test Two</option>
+                    <option value="Test Three" selected>Test Three</option>
+                    <option value="Final Exam">Final Exam</option>
+                </select>
+            </label>
+            <label>Academic Subject Assignment:
+                <select id="insSubject"></select>
+            </label>
+
+            <hr style="margin:25px 0; opacity:0.2;">
+
+            <h3>Publish Official Document (PDF Viewer Output Engine)</h3>
+            <label>Display File Resource Title:
+                <input type="text" id="teacherDocTitle" placeholder="e.g., National Matric Mathematics 2018 Booklet A">
+            </label>
+            <label>Select Real Local System PDF File:
+                <input type="file" id="teacherDocFile" accept=".pdf">
+            </label>
+            <button onclick="commitPdfToGlobalDatabase()" style="background:#28a745; width:100%; margin-top:10px;"><i class="fa fa-cloud-upload-alt"></i> Publish Live System Document</button>
+            
+            <p id="operationStatusMessage" style="margin-top:15px; font-weight:bold;"></p>
+        </div>
+
+        <div class="panel-box" style="border-top: 4px solid #dc3545; margin-top:25px;">
+            <h3 style="color:#dc3545;">Active Content Resource Revocation Archive</h3>
+            <table class="manage-table">
+                <thead>
+                    <tr>
+                        <th>Destination Pathway Target Reference</th>
+                        <th>Document Asset Title</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="managementTableFeed"></tbody>
+            </table>
+        </div>
+
+        <button class="back-btn" onclick="switchView('streamPage')"><i class="fa fa-door-open"></i> Close Management Control Panel</button>
+    </section>
+
+    <footer>
+        <h3>ERGEB Educational Platform</h3>
+        <p>Providing functional, integrated learning environments, comprehensive matrix checks, peer evaluation systems, and digital resource archives.</p>
+    </footer>
+
+    <script>
+        /* ARRAY CONFIGURATIONS AND MATRIX HOOKS */
+        let activeStream = "", activeGrade = "", activeYear = "", activeTest = "", activeSubject = "";
+
+        const streamSubjectMap = {
+            "Natural Science": ["Mathematics", "Physics", "Chemistry", "Biology", "English", "Civics", "SAT"],
+            "Social Science": ["Mathematics", "Geography", "History", "Economics", "English", "Civics", "SAT"]
+        };
+
+        // Core data storage arrays synced using standard file parsing keys
+        let uploadedPdfDatabase = JSON.parse(localStorage.getItem("ERGEB_PDFS")) || [];
+        let systemCommentsData = JSON.parse(localStorage.getItem("ERGEB_COMMENTS")) || {};
+
+        /* HARDCODED 15 DETAILED MATRIC EXAM EXTRA QUESTIONS FALLBACK DATABASE */
+        const coreMatricQuestionsArray = [
+            { id: 1, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Mathematics", text: "Determine the solution set of the absolute value inequality: |2x - 5| >= 3x + 1.", opts: ["(-inf, 4/5]", "[-6, 4/5]", "(-inf, -6]", "[-6, inf)"], correct: "3" },
+            { id: 2, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Mathematics", text: "What is the exact sum of the infinite geometric series: 5 - 10/3 + 20/9 - 40/27 + ...?", opts: ["3", "15", "15/4", "3/4"], correct: "2" },
+            { id: 3, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Physics", text: "A projectile is launched from ground level at an angle of 30 degrees with a velocity of 40 m/s. Calculate its maximum horizontal displacement range.", opts: ["80 m", "80*sqrt(3) m", "160 m", "40*sqrt(3) m"], correct: "2" },
+            { id: 4, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Physics", text: "Two bodies of mass 2kg and 6kg are connected by a light string passing over a frictionless pulley. Find the acceleration magnitude of the system.", opts: ["g/4", "g/2", "3g/4", "g"], correct: "2" },
+            { id: 5, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Chemistry", text: "What is the correct oxidation state value of the Chromium atom inside the Dichromate complex ion (Cr2O7^2-)?", opts: ["+3", "+4", "+6", "+7"], correct: "3" },
+            { id: 6, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Chemistry", text: "According to Ideal Gas laws, if a sample configuration triples its absolute temperature while its total volume drops by 50%, what is the final pressure factor ratio change?", opts: ["Increases by 6 times", "Decreases to 1/6", "Triples completely", "Remains uniform"], correct: "1" },
+            { id: 7, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Biology", text: "Which membrane protein structure directly expels 3 Na+ ions while importing 2 K+ ions via target metabolic currency consumption?", opts: ["Aquaporin Channel", "Sodium-Potassium Pump", "Calcium Gate", "Glucose Transporter"], correct: "2" },
+            { id: 8, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Biology", text: "Identify the critical phase transition stage of cellular mitosis where sister chromatid lines break apart toward opposite poles.", opts: ["Prophase", "Metaphase", "Anaphase", "Telophase"], correct: "3" },
+            { id: 9, stream: "Social Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Mathematics", text: "Find the explicit equation of a line passing through matrix point (3, -2) that runs perpendicular to 4x - 3y = 9.", opts: ["3x + 4y = 1", "3x - 4y = 17", "4x + 3y = 6", "3x + 4y = -1"], correct: "1" },
+            { id: 10, stream: "Social Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Economics", text: "If market price conditions sit below equilibrium points, what immediate systemic structural phenomenon happens inside competitive commercial environments?", opts: ["Market surplus", "Price deflation cascades", "Market Shortage", "Supply ceiling stabilization"], correct: "3" },
+            { id: 11, stream: "Social Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Geography", text: "Which atmospheric structural boundary contains the highest overall volumetric moisture ratio concentration profiles?", opts: ["Stratosphere", "Troposphere", "Mesosphere", "Thermosphere"], correct: "2" },
+            { id: 12, stream: "Social Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "History", text: "What major geo-political tactical realignment agreement sequence prompted the partition of African territories during the late 19th century?", opts: ["Treaty of Westphalia", "Berlin Conference (1884-1885)", "Treaty of Versailles", "League of Nations Directive"], correct: "2" },
+            { id: 13, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "English", text: "Complete the sentence structure: 'Had they reviewed the core dataset variables prior to deployment, the system errors _______.'", opts: ["would be avoided", "will have been avoided", "would have been avoided", "had avoided"], correct: "3" },
+            { id: 14, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "Civics", text: "Which core constitutional principle directly prevents any single administrative organ from gathering absolute structural control dominance?", opts: ["Popular Sovereignty", "Separation of Powers & Checks", "Federal Decentralization", "Rule of Statutory Law"], correct: "2" },
+            { id: 15, stream: "Natural Science", grade: "Grade 11", year: "2018", test: "Test Three", subject: "SAT", text: "In a class of 60 individuals, 40% study Advanced Statistics and 30% take Linear Algebra. If 10% monitor both tracks, how many track neither module?", opts: ["24", "18", "36", "42"], correct: "1" }
+        ];
+
+        /* LAYOUT AND TRANSITION MANAGEMENT CONTROLLERS */
+        function switchView(targetId) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+            const targetPage = document.getElementById(targetId);
+            if(targetPage) targetPage.classList.add("active");
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            // Re-trigger visual alignment scan anytime layout parameters shift
+            checkCards();
+        }
+
+        /* LIVE REALTIME FILTERING ENGINE FOR STREAM INPUT SEARCH BAR */
+        function filterStreams() {
+            let filter = document.getElementById("streamSearch").value.toLowerCase();
+            let cards = document.querySelectorAll("#streamGrid .card");
+            cards.forEach(card => {
+                let matchContent = card.innerText.toLowerCase();
+                card.style.display = matchContent.includes(filter) ? "block" : "none";
+            });
+            // Recompute parameters following explicit DOM element removal actions
+            checkCards();
+        }
+
+        /* ROUTING DATA STRUCTURAL NAVIGATION FLOWS */
+        function openGradePage(streamName) {
+            activeStream = streamName;
+            document.getElementById("streamTitle").innerText = `${activeStream} Channel Selection`;
+            switchView("gradePage");
+        }
+
+        /* OFFLINE COMPATIBLE DUAL-TRIGGER CARD ANIMATION SCRIPT LOGIC */
+        function checkCards() {
+            // Evaluates visibility tags across any cards actively appended to the visible DOM workspace
+            const activeCards = document.querySelectorAll(".page.active .card");
+            activeCards.forEach(card => {
+                const top = card.getBoundingClientRect().top;
+                if (top < window.innerHeight - 50) {
+                    card.style.opacity = "1";
+                    card.style.transform = "translateY(0)";
+                }
+            });
+        }
+
+        // Attach layout runtime triggers to intercept window activity tracking
+        window.addEventListener("scroll", checkCards);
+        window.addEventListener("load", checkCards);
+
+        function openYearPage(gradeName) {
+            activeGrade = gradeName;
+            document.getElementById("gradeTitle").innerText = `${activeStream} > ${activeGrade}`;
+            switchView("yearPage");
+        }
+
+        function openTestPage(yearName) {
+            activeYear = yearName;
+            document.getElementById("yearTitle").innerText = `${activeStream} > ${activeGrade} > ${activeYear} EC Archive`;
+            switchView("testPage");
+        }
+
+        function openSubjectPage(testName) {
+            activeTest = testName;
+            document.getElementById("testTitle").innerText = `${activeStream} > ${activeGrade} > ${activeYear} EC > ${activeTest}`;
+            
+            const grid = document.getElementById("subjectGrid");
+            grid.innerHTML = "";
+            const courses = streamSubjectMap[activeStream] || [];
+            
+            courses.forEach(sub => {
+                let div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                    <h2><i class="fa fa-book-open"></i> ${sub}</h2>
+                    <p>Enter workspace to parse system tracking documents and metric questions.</p>
+                    <button onclick="launchExamHub('${sub}')">Enter Hub</button>
+                `;
+                grid.appendChild(div);
+            });
+            switchView("subjectPage");
+        }
+
+        function openTeacherPanel() {
+            switchView("teacherPanelPage");
+            syncPanelCourseDropdown();
+            renderManagementTables();
+        }
+
+        function syncPanelCourseDropdown() {
+            const currentStream = document.getElementById("insStream").value;
+            const subSelect = document.getElementById("insSubject");
+            subSelect.innerHTML = "";
+            (streamSubjectMap[currentStream] || []).forEach(s => {
+                let opt = document.createElement("option");
+                opt.value = s; opt.innerText = s;
+                subSelect.appendChild(opt);
+            });
+        }
+
+        /* DUAL EXAM TERMINAL LOGICAL ENGINE CONTROL HOOK */
+        function launchExamHub(subjectName) {
+            activeSubject = subjectName;
+            document.getElementById("displaySubjectTitle").innerText = `${activeSubject} - ${activeGrade} (${activeYear} EC ${activeTest})`;
+            
+            document.getElementById("quizScoreReportResult").style.display = "none";
+            document.getElementById("newCommentInput").value = "";
+
+            renderLiveStudentWorkspace();
+            switchView("examPage");
+        }
+
+        /* THE CHIEF FUNCTIONAL ENGINE: PREVIEWS REAL INTEGRATED PDF DATA STREAM WITHOUT DATA LOSS */
+        function renderLiveStudentWorkspace() {
+            const pdfContainer = document.getElementById("livePdfPortalContainer");
+            pdfContainer.innerHTML = "";
+
+            let matchedFiles = uploadedPdfDatabase.filter(p => 
+                p.stream === activeStream &&
+                p.grade === activeGrade &&
+                p.year === activeYear &&
+                p.test === activeTest &&
+                p.subject === activeSubject
+            );
+
+            if (matchedFiles.length === 0) {
+                pdfContainer.innerHTML = `
+                    <div style="background:#fff3cd; color:#856404; padding:20px; border-radius:12px; font-style:italic;">
+                        <i class="fa fa-exclamation-triangle"></i> No official PDF document file has been published by the management console to this specific section yet.
+                    </div>`;
+            } else {
+                matchedFiles.forEach(fileNode => {
+                    let wrapper = document.createElement("div");
+                    wrapper.className = "pdf-wrapper-node";
+                    wrapper.innerHTML = `
+                        <h4 style="color:#003366; margin-bottom:10px;"><i class="fa fa-file-invoice"></i> Active Viewport: ${fileNode.title}</h4>
+                        <embed src="${fileNode.fileData}" type="application/pdf" class="pdf-view-frame" />
+                    `;
+                    pdfContainer.appendChild(wrapper);
+                });
+            }
+
+            const questionsContainer = document.getElementById("studentMatricQuestionsFeed");
+            questionsContainer.innerHTML = "";
+
+            let targetedQues = coreMatricQuestionsArray.filter(q => 
+                q.stream === activeStream &&
+                q.grade === activeGrade &&
+                q.year === activeYear &&
+                q.test === activeTest &&
+                q.subject === activeSubject
+            );
+
+            if (targetedQues.length === 0) {
+                questionsContainer.innerHTML = `<p style="color:gray; font-style:italic;">No dynamic assessment keys found for this course criteria matrix.</p>`;
+                document.getElementById("quizSubmitActionBlock").style.display = "none";
+            } else {
+                targetedQues.forEach((q, idx) => {
+                    let qDiv = document.createElement("div");
+                    qDiv.className = "question-box";
+                    let optsHtml = "";
+                    q.opts.forEach((o, oIdx) => {
+                        optsHtml += `
+                            <label>
+                                <input type="radio" name="matricQ_${q.id}" value="${oIdx + 1}">
+                                ${String.fromCharCode(65 + oIdx)}. ${o}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `
+                        <p style="font-weight:bold; font-size:16px;">Question ${idx + 1}: ${q.text}</p>
+                        <div style="margin-top:10px;">${optsHtml}</div>
+                    `;
+                    questionsContainer.appendChild(qDiv);
+                });
+                document.getElementById("quizSubmitActionBlock").style.display = "block";
+            }
+
+            renderCommentsFeed();
+        }
+
+        /* PEER DISCUSSION LOGICAL ENGINE CONTROLLERS */
+        function renderCommentsFeed() {
+            const feed = document.getElementById("commentListFeed");
+            feed.innerHTML = "";
+            let key = `${activeStream}_${activeGrade}_${activeYear}_${activeTest}_${activeSubject}`;
+            let list = systemCommentsData[key] || [];
+
+            if(list.length === 0) {
+                feed.innerHTML = `<li class="comment-item" style="color:gray; font-style:italic;">No forum entries created yet. Post a diagnostic response to open active logs.</li>`;
+            } else {
+                list.forEach(c => {
+                    let li = document.createElement("li");
+                    li.className = "comment-item";
+                    li.innerHTML = `<b>Anonymous Student:</b> ${c}`;
+                    feed.appendChild(li);
+                });
+            }
+        }
+
+        function postStudentComment() {
+            const inp = document.getElementById("newCommentInput");
+            if(!inp.value.trim()) return;
+            let key = `${activeStream}_${activeGrade}_${activeYear}_${activeTest}_${activeSubject}`;
+            if(!systemCommentsData[key]) systemCommentsData[key] = [];
+            systemCommentsData[key].push(inp.value.trim());
+            localStorage.setItem("ERGEB_COMMENTS", JSON.stringify(systemCommentsData));
+            inp.value = "";
+            renderCommentsFeed();
+        }
+
+        /* MATRIC PERFORMANCE INDEX CALCULATION STRATEGY */
+        function evaluateMatricPerformanceIndex() {
+            let targetedQues = coreMatricQuestionsArray.filter(q => 
+                q.stream === activeStream &&
+                q.grade === activeGrade &&
+                q.year === activeYear &&
+                q.test === activeTest &&
+                q.subject === activeSubject
+            );
+
+            let score = 0;
+            targetedQues.forEach(q => {
+                let selected = document.querySelector(`input[name="matricQ_${q.id}"]:checked`);
+                if(selected && selected.value === q.correct) {
+                    score++;
+                }
+            });
+
+            const report = document.getElementById("quizScoreReportResult");
+            report.style.display = "block";
+            let percent = targetedQues.length ? Math.round((score / targetedQues.length) * 100) : 0;
+            report.innerText = `Evaluation Completed! Total Score Index: ${score} / ${targetedQues.length} (${percent}%)`;
+            report.style.background = percent >= 50 ? "#d4edda" : "#f8d7da";
+            report.style.color = percent >= 50 ? "#155724" : "#721c24";
+        }
+
+        /* MANAGEMENT ARRAY DB COMMIT ROUTINES */
+        function commitPdfToGlobalDatabase() {
+            const titleInp = document.getElementById("teacherDocTitle");
+            const fileInp = document.getElementById("teacherDocFile");
+            const msg = document.getElementById("operationStatusMessage");
+
+            if(!titleInp.value.trim() || !fileInp.files[0]) {
+                msg.style.color = "red";
+                msg.innerText = "Error: Assign an explicit descriptive asset title and fetch a valid local file path source.";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let payload = {
+                    id: Date.now(),
+                    stream: document.getElementById("insStream").value,
+                    grade: document.getElementById("insGrade").value,
+                    year: document.getElementById("insYear").value,
+                    test: document.getElementById("insTest").value,
+                    subject: document.getElementById("insSubject").value,
+                    title: titleInp.value.trim(),
+                    fileData: e.target.result
+                };
+
+                uploadedPdfDatabase.push(payload);
+                localStorage.setItem("ERGEB_PDFS", JSON.stringify(uploadedPdfDatabase));
+
+                msg.style.color = "green";
+                msg.innerText = "Success: Resource added to local storage matrices.";
+                titleInp.value = "";
+                fileInp.value = "";
+                renderManagementTables();
+            };
+            reader.readAsDataURL(fileInp.files[0]);
+        }
+
+        function removePdfAsset(assetId) {
+            uploadedPdfDatabase = uploadedPdfDatabase.filter(p => p.id !== assetId);
+            localStorage.setItem("ERGEB_PDFS", JSON.stringify(uploadedPdfDatabase));
+            renderManagementTables();
+        }
+
+        function renderManagementTables() {
+            const tbody = document.getElementById("managementTableFeed");
+            tbody.innerHTML = "";
+
+            if(uploadedPdfDatabase.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; font-style:italic;">No files uploaded into localized client repository arrays yet.</td></tr>`;
+                return;
+            }
+
+            uploadedPdfDatabase.forEach(p => {
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="font-size:13px; color:#555;">[${p.stream}] -> ${p.grade} -> ${p.year} EC -> ${p.test} -> <b>${p.subject}</b></td>
+                    <td><b>${p.title}</b></td>
+                    <td><button onclick="removePdfAsset(${p.id})" style="background:#dc3545; padding:6px 12px; font-size:12px;">Delete</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        /* DARK MODE BUTTON TOGGLE INTERFACE ENGAGEMENT RULES */
+        const darkBtn = document.getElementById("darkBtn");
+        darkBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            if (document.body.classList.contains("dark-mode")) {
+                darkBtn.innerHTML = "☀️ Light Mode";
+            } else {
+                darkBtn.innerHTML = "🌙 Dark Mode";
+            }
+        });
+    </script>
+</body>
+
+</html>

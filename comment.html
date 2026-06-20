@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERGEB Educational Workspace - Platform Terminal Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        /* BODY & TRANSITIONS */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+            transition: 0.4s;
+            overflow-x: hidden;
+        }
+
+        /* DARK MODE IMPLEMENTATION */
+        .dark-mode {
+            background: #121212;
+            color: white;
+        }
+
+        /* CORE COMPONENT STYLING: MOVABLE HEADER */
+        header {
+            background: linear-gradient(90deg, #003366, #0055aa);
+            color: white;
+            padding: 20px;
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: slideDown 1s ease;
+            text-align: center;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo {
+            width: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 10px;
+            
+            height: auto;
+        }
+
+
+        header h1 {
+            font-size: 38px;
+            margin-top: 10px;
+            text-shadow: 2px 2px 5px black;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: 0.4s;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        nav a:hover, nav a.active-link {
+            background: white;
+            color: #003366;
+            transform: scale(1.1);
+        }
+
+        #modeBtn {
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: white;
+            color: #003366;
+            transition: 0.4s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #modeBtn:hover {
+            background: black;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* CONTAINER SYSTEM LAYOUTS */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 60px 20px;
+        }
+
+        .comment-page-stage {
+            display: none;
+        }
+
+        .comment-page-stage.stage-active {
+            display: block;
+        }
+
+        .workspace-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            transition: 0.5s;
+        }
+
+        .dark-mode .workspace-card {
+            background: #1e1e1e;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* GRID ARRANGEMENTS */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .interactive-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .dark-mode .interactive-card {
+            background: #252525;
+            border-color: #333;
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: #0055aa;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .interactive-card i {
+            font-size: 55px;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .interactive-card i {
+            color: #4da6ff;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+        }
+
+        .dark-mode input, .dark-mode select, .dark-mode textarea {
+            border-color: #444;
+            background: #2b2b2b;
+        }
+
+        /* PASSWORD INPUT EYE-TOGGLE CONTAINER */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: calc(50% + 3px);
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            transition: 0.2s;
+        }
+
+        .password-toggle-icon:hover {
+            color: #0055aa;
+        }
+
+        .dark-mode .password-toggle-icon {
+            color: #aaa;
+        }
+
+        .dark-mode .password-toggle-icon:hover {
+            color: #4da6ff;
+        }
+
+        /* CODE CONSOLE GRAPHICS */
+        .code-editor-box {
+            font-family: 'Courier New', Courier, monospace;
+            background: #151515;
+            color: #00ff66;
+            border: 2px solid #333;
+            padding: 15px;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        /* SENTIMENT EVALUATION STYLES */
+        .opinion-log-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border-left: 6px solid;
+        }
+
+        .opinion-node-positive {
+            background: rgba(40, 167, 69, 0.1);
+            border-left-color: #28a745;
+            color: #1e7e34;
+        }
+        .dark-mode .opinion-node-positive { background: rgba(40, 167, 69, 0.2); color: #2ced6b; }
+
+        .opinion-node-negative {
+            background: rgba(220, 53, 69, 0.1);
+            border-left-color: #dc3545;
+            color: #bd2130;
+        }
+        .dark-mode .opinion-node-negative { background: rgba(220, 53, 69, 0.2); color: #ff5c6c; }
+
+        /* VIRTUAL TERMINAL MESSAGE VIEWPADS */
+        .conversation-terminal-viewport {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .dark-mode .conversation-terminal-viewport {
+            background: #1a1a1a;
+            border-color: #444;
+        }
+
+        .msg-bubble {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+
+        .msg-guest { background: #e1f5fe; color: #0277bd; margin-right: auto; }
+        .dark-mode .msg-guest { background: #003366; color: #e1f5fe; }
+
+        .msg-developer { background: #e8f5e9; color: #2e7d32; margin-left: auto; text-align: right; }
+        .dark-mode .msg-developer { background: #1b5e20; color: #e8f5e9; }
+
+        /* BUTTON LAYOUT ARCHITECTURE */
+        button.btn-student, button.btn-danger, button.btn-nav, button.btn-warn {
+            padding: 12px 22px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.4s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-student { background: #28a745; color: white; }
+        .btn-student:hover { background: #218838; transform: scale(1.05); }
+        
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #bd2130; transform: scale(1.05); }
+
+        .btn-warn { background: #ffcc00; color: #111; }
+        .btn-warn:hover { background: #e6b800; transform: scale(1.05); }
+        
+        .btn-nav { background: rgba(0,0,0,0.05); color: #333; }
+        .btn-nav:hover { transform: scale(1.05); }
+        .dark-mode .btn-nav { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .breadcrumb-trail {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .dark-mode .breadcrumb-trail { color: #aaa; }
+
+        footer {
+            background: #003366; color: white; text-align: center; padding: 30px; margin-top: 60px;
+        }
+        .dark-mode footer { background: black; }
+
+        .scrollTop {
+            position: fixed; bottom: 20px; right: 20px; background: #003366; color: white;
+            border: none; padding: 15px 18px; border-radius: 50%; cursor: pointer;
+            font-size: 20px; display: none; z-index: 999;
+        }
+        .scrollTop:hover { background: green; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <header id="mainAppHeader">
+        <img src="OIP (1).webp" class="logo" alt="Logo">
+        <h1>ERGEB Educational Hub</h1>
+        <nav>
+            <a href="index.html"><i class="fa fa-home"></i> Home</a>
+            <a href="exam.html"><i class="fa fa-book"></i> Exam</a>
+            <a href="resource.html"><i class="fa fa-star"></i> Resource</a>
+            <a href="engagement.html"><i class="fa fa-users"></i> Engagement</a>
+            <a href="comment.html" class="active-link"><i class="fa fa-comments"></i> Comment</a>
+        </nav>
+        <button id="modeBtn">🌙 Dark Mode</button>
+    </header>
+
+    <main class="container">
+
+        <section id="commentStageRootMenu" class="comment-page-stage stage-active">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Terminal > Workspace Modules</div>
+                <h1>Platform Interaction Terminal</h1>
+                <p style="color: gray; margin-top: 5px;">Select your execution track interface branch below to input data arrays.</p>
+                
+                <div class="selection-grid">
+                    <div class="interactive-card" onclick="advanceWorkflowStage('commentStageFeedbackDesk')">
+                        <i class="fa fa-comment-medical" style="color: #0055aa;"></i>
+                        <h3>Feedback Give Page</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Post dynamic evaluation metrics directly into our shared performance log registries.</p>
+                    </div>
+                    <div class="interactive-card" onclick="advanceWorkflowStage('commentStageInteractionHubMenu')">
+                        <i class="fa fa-network-wired" style="color: #ffcc00;"></i>
+                        <h3>Interaction Page</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Access structured communication channels and teacher planner interfaces.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="commentStageFeedbackDesk" class="comment-page-stage">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Terminal > Feedback Give Page</div>
+                <h1>Feedback Giving Place</h1>
+                <p style="color: gray; margin-top: 5px;">Submit site parameters verification assessments below to display calculated log frames color grids.</p>
+                
+                <div style="max-width: 650px; margin-top: 25px; padding: 25px; background: rgba(0,0,0,0.01); border: 1px solid #ddd; border-radius: 12px;">
+                    <form onsubmit="processNewUserOpinionPacket(event)">
+                        <label>Identity Handle Tag Name:</label>
+                        <input type="text" id="opinionNameField" placeholder="Type your identity registration handle..." required>
+                        
+                        <label>Platform Performance Script Content Rows:</label>
+                        <textarea id="opinionContentField" rows="4" placeholder="Enter review data here... (Tip: Positive keywords build green matrices, negative strings throw red frames)" required></textarea>
+                        
+                        <button type="submit" class="btn-student" style="width: 100%; margin-top: 15px; justify-content: center;">
+                            <i class="fa fa-share-square"></i> Publish Assessment Packet
+                        </button>
+                    </form>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h2>Active Live Evaluation Log Matrix</h2>
+                    <div id="opinionFeedRenderBox" style="margin-top:15px; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                    </div>
+                </div>
+
+                <button class="btn-nav" style="margin-top: 30px;" onclick="advanceWorkflowStage('commentStageRootMenu')">
+                    <i class="fa fa-arrow-left"></i> Return to Main Menu
+                </button>
+            </div>
+        </section>
+
+        <section id="commentStageInteractionHubMenu" class="comment-page-stage">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Terminal > Interaction Page center</div>
+                <h1>Teacher Planner</h1>
+                <p style="color: gray; margin-top: 5px;">Specify your active terminal verification track below to update platform values.</p>
+                
+                <div class="selection-grid">
+                    <div class="interactive-card" onclick="prepareAndResetGuestInputModule()">
+                        <i class="fa fa-circle-question" style="color: #28a745;"></i>
+                        <h3>Guest Page</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">Open the registry channel panel to submit unresolved assignment tickets.</p>
+                    </div>
+                    <div class="interactive-card" onclick="prepareAndVerifyDeveloperGateState()">
+                        <i class="fa fa-chart-line" style="color: #dc3545;"></i>
+                        <h3>Developer Page</h3>
+                        <p style="margin-top:10px; font-size:14px; opacity:0.8;">See metrics dashboards, apply customizable runtime engine codes, and post answer packets.</p>
+                    </div>
+                </div>
+
+                <button class="btn-nav" style="margin-top: 30px;" onclick="advanceWorkflowStage('commentStageRootMenu')">
+                    <i class="fa fa-arrow-left"></i> Back to Main Menu
+                </button>
+            </div>
+        </section>
+
+        <section id="commentStageGuestRegistrationForm" class="comment-page-stage">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Teacher Planner > Guest Page</div>
+                <h1 id="guestPageMainHeadline">Sign Up Page</h1>
+                <p id="guestPageSubInstructions" style="color: gray; margin-top: 5px;">Declare a tracking alias block handle value below to acquire system keys.</p>
+
+                <div style="max-width: 500px; margin: 30px 0; padding: 25px; background: rgba(0,0,0,0.02); border: 1px solid #ddd; border-radius: 12px;">
+                    
+                    <div id="guestSignUpActionHaltModule">
+                        <label>Nominate Unique Workspace Username Handle:</label>
+                        <input type="text" id="guestRegisterUsernameInput" placeholder="Create identity tag string (e.g., Rahel_Node)...">
+                        
+                        <button class="btn-student" style="width:100%; margin-top:15px; justify-content:center;" onclick="executeGuestAccountRegistrationPipeline()">
+                            <i class="fa fa-id-badge"></i> Initialize System Key Generation / Login
+                        </button>
+                    </div>
+
+                    <div id="guestLoginVerificationModule" style="display:none; margin-top:10px;">
+                        <label>Enter Registered 4-Digit Password Code Node:</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="guestLoginCodeInputField" placeholder="Enter 4-Digit Passcode..." style="text-align:center;" maxlength="4">
+                            <i class="fa fa-eye password-toggle-icon" onclick="togglePasswordVisibility('guestLoginCodeInputField', this)"></i>
+                        </div>
+                        
+                        <button class="btn-warn" style="width:100%; margin-top:15px; justify-content:center;" onclick="validateGuestPasscodeLoginStream()">
+                            <i class="fa fa-unlock-alt"></i> Enter Chat Console
+                        </button>
+                    </div>
+
+                    <div id="guestSignUpTokenRevealArea" style="display:none; margin-top:15px; border-top:2px dashed #bbb; padding-top:20px;">
+                        <div style="background: rgba(40,167,69,0.15); border: 1px solid #28a745; padding: 15px; border-radius: 8px; color: #1e7e34;">
+                            <h4><i class="fa fa-shield-alt"></i> Your Password Code Node:</h4>
+                            <span id="renderedGuestSecurePasswordCodeNode" style="font-size:24px; font-weight:bold; color:#ffcc00; background:#111; padding:4px 12px; display:inline-block; border-radius:6px; margin:10px 0;">0000</span>
+                            <p style="font-size:12.5px; color:gray;">System entry passcode registered. Securely copy this profile allocation identifier code.</p>
+                        </div>
+                        
+                        <button class="btn-warn" style="width:100%; margin-top:20px; justify-content:center; font-size:16px;" onclick="advanceWorkflowStage('commentStageGuestToDeveloperChatConsole')">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-danger" onclick="advanceWorkflowStage('commentStageInteractionHubMenu')">
+                    <i class="fa fa-times"></i> Cancel Registration Process
+                </button>
+            </div>
+        </section>
+
+        <section id="commentStageGuestToDeveloperChatConsole" class="comment-page-stage">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Guest Page > Communication Core</div>
+                <h1 style="color:#0055aa;"><i class="fa fa-paper-plane"></i> Guest Communication to Developer Page</h1>
+                <p style="color:gray;">Active Secure Socket Session Frame Bound to: <strong id="activeGuestSessionIdentityLabelText" style="color:#222;">None</strong></p>
+
+                <div class="conversation-terminal-viewport" id="guestChatFeedScrollWindow"></div>
+
+                <div style="display:flex; gap:10px; max-width: 800px;">
+                    <input type="text" id="guestChatMessageTextInput" placeholder="Type data stream script question lines to developers..." style="margin-top:0;">
+                    <button class="btn-student" onclick="dispatchGuestMessageToDeveloperPipeline()"><i class="fa fa-send"></i> Send</button>
+                </div>
+
+                <div style="margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
+                    <button class="btn-danger" onclick="terminateAndClearActiveGuestSession()"><i class="fa fa-sign-out-alt"></i> Close Channel Connection</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="commentStageDeveloperAuthenticationGate" class="comment-page-stage">
+            <div class="workspace-card" style="text-align:center; padding:50px 20px;">
+                <div class="breadcrumb-trail" style="text-align:left;">Developer Page > Security Authentication Check</div>
+                <i class="fa fa-lock" style="font-size:65px; color:#dc3545; margin-bottom:20px;"></i>
+                
+                <h1 id="developerGateHeadlineText">Fill Password First</h1>
+                <p id="developerGateInstructionsText" style="color:gray;">Input master workspace credentials tokens below to clear visual security blockades.</p>
+
+                <div style="max-width:360px; margin:20px auto;">
+                    <div class="password-wrapper">
+                        <input type="password" id="developerPortalVerificationTokenField" placeholder="Enter Administrative Token..." style="text-align:center;">
+                        <i class="fa fa-eye password-toggle-icon" onclick="togglePasswordVisibility('developerPortalVerificationTokenField', this)"></i>
+                    </div>
+                    
+                    <button id="developerGateSubmitActionBtn" class="btn-warn" style="width:100%; margin-top:15px; justify-content:center;" onclick="executeDeveloperConsoleAuthorizationPipeline()">
+                        <i class="fa fa-unlock"></i> Enter Developer Page
+                    </button>
+                </div>
+
+                <button class="btn-nav" style="margin-top:20px;" onclick="advanceWorkflowStage('commentStageInteractionHubMenu')"><i class="fa fa-arrow-left"></i> Abort Verification</button>
+            </div>
+        </section>
+
+        <section id="commentStageDeveloperVerifiedDashboardDesk" class="comment-page-stage">
+            <div class="workspace-card">
+                <div class="breadcrumb-trail">Teacher Planner -> Developer Page Operations</div>
+                <h1 style="color:#28a745;"><i class="fa fa-terminal"></i> Developer Page</h1>
+                <p style="color:gray;">Review student coordination metrics, manage custom access codes, or execute dynamic modifications instantly.</p>
+
+                <div style="margin: 25px 0; padding: 20px; background: rgba(0,0,0,0.03); border: 1px solid #bbb; border-radius: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+                    <div>
+                        <h3 style="color: #dc3545; margin-bottom: 5px;"><i class="fa fa-key"></i> Security Key Management</h3>
+                        <p style="font-size: 13px; color: gray; margin-bottom: 15px;">Modify or redefine your admin console entry passcode string token directly.</p>
+                        
+                        <label>Enter New Admin Passcode Token:</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="developerConsoleNewPasswordChangeField" placeholder="Type new password assignment value...">
+                            <i class="fa fa-eye password-toggle-icon" onclick="togglePasswordVisibility('developerConsoleNewPasswordChangeField', this)"></i>
+                        </div>
+                        
+                        <button class="btn-danger" style="margin-top:12px; font-size:14px; border-radius:8px;" onclick="modifyAndSaveDeveloperMasterPassword()">
+                            <i class="fa fa-exchange-alt"></i> Change Access Authentication Key
+                        </button>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #0055aa; margin-bottom: 5px;"><i class="fa fa-code"></i> Live Runtime Code Terminal</h3>
+                        <p style="font-size: 13px; color: gray; margin-bottom: 15px;">Apply code configurations directly, or swap methods using the template selector.</p>
+                        
+                        <label>Select System Change Method Template:</label>
+                        <select id="developerMethodTemplateSelector" onchange="loadSelectedMethodCodeTemplateIntoConsole()" style="margin-bottom:15px;">
+                            <option value="custom">-- Custom Script Setup Input --</option>
+                            <option value="alertChange">Method: Alter Core Platform Title Header</option>
+                            <option value="colorOverride">Method: Force Matrix Background Overlay Style</option>
+                            <option value="clearLogs">Method: Flush Active Runtime Feedback Datasets</option>
+                        </select>
+
+                        <label>Terminal Workspace Script Body:</label>
+                        <textarea id="developerLiveTerminalCodeArea" rows="4" class="code-editor-box" placeholder="// Enter your JavaScript logic parameters block here...&#10;alert('Platform Runtime Injected Successfully!');"></textarea>
+                        
+                        <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-student" style="padding:8px 16px; font-size:13px; border-radius:8px;" onclick="applyAndExecuteDeveloperTerminalCode()"><i class="fa fa-play"></i> Apply Code</button>
+                            <button class="btn-nav" style="padding:8px 16px; font-size:13px; border-radius:8px;" onclick="resetDeveloperTerminalCodeArea()"><i class="fa fa-refresh"></i> Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 30px 0;">
+
+                <div style="max-width:400px; margin-top:20px;">
+                    <label>Target Active Connection Link Channel:</label>
+                    <select id="developerTargetChannelDropdownSelector" onchange="renderActiveDeveloperTargetChatWindow()"></select>
+                </div>
+
+                <div class="conversation-terminal-viewport" id="developerChatFeedScrollWindow"></div>
+
+                <div style="display:flex; gap:10px; max-width:800px;">
+                    <input type="text" id="developerResponsePacketTextArea" placeholder="Type corrective answer block script row parameters here..." style="margin-top:0;">
+                    <button class="btn-student" onclick="dispatchDeveloperReplyToActiveChannelPipeline()"><i class="fa fa-reply"></i> Transmit Reply Packet</button>
+                </div>
+
+                <div style="margin-top:35px; padding-top:20px; border-top:1px dashed #ccc;">
+                    <button class="btn-danger" onclick="lockDeveloperTerminalAccessSession()"><i class="fa fa-lock"></i> Lock System Terminal</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <h3>ERGEB Educational Platform</h3>
+        <p>Empowering students through educational engagement, Presentations, modern learning systems, and innovative exam mechanisms.</p>
+    </footer>
+
+    <button class="scrollTop" id="topBtn">↑</button>
+
+    <script>
+        /* STORAGE CACHE MEMORY DATABASE SCHEMAS */
+        let localCacheOpinionsDatabase = JSON.parse(localStorage.getItem("ERGEB_PLATFORM_OPINIONS")) || [];
+        let localCacheGuestDirectory = JSON.parse(localStorage.getItem("ERGEB_PLATFORM_GUEST_REGISTRY")) || {};
+        let localCacheChatTransmissionsLog = JSON.parse(localStorage.getItem("ERGEB_PLATFORM_CHATS")) || {};
+
+        let globalRuntimeActiveGuestSessionUserKey = "";
+
+        /* WINDOW STAGE INITIAL LOAD HOOKS */
+        window.onload = function() {
+            rebuildPlatformOpinionsLogViewFeed();
+            synchronizeDeveloperWorkspaceDropdownOptions();
+        };
+
+        /* CENTRAL VIEW CONTROLLER ENGINE PIPELINE ROUTER */
+        function advanceWorkflowStage(targetPageStageId) {
+            document.querySelectorAll(".comment-page-stage").forEach(stage => stage.classList.remove("stage-active"));
+            
+            const selectedStageNode = document.getElementById(targetPageStageId);
+            if(selectedStageNode) selectedStageNode.classList.add("stage-active");
+
+            if(document.body.classList.contains("dark-mode")) {
+                document.querySelectorAll(".workspace-card h1, .workspace-card h2").forEach(title => title.style.color = "white");
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* PASSWORD VISIBILITY TOGGLE CONTROLLER */
+        function togglePasswordVisibility(fieldId, toggleIcon) {
+            const passwordField = document.getElementById(fieldId);
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordField.type = "password";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+        }
+
+        /* ==================== SECURE DYNAMIC INITIAL PASSWORD SETUP CONFIGURATORS ==================== */
+        function prepareAndVerifyDeveloperGateState() {
+            const headlineNode = document.getElementById("developerGateHeadlineText");
+            const instructNode = document.getElementById("developerGateInstructionsText");
+            const inputField = document.getElementById("developerPortalVerificationTokenField");
+            const actionButton = document.getElementById("developerGateSubmitActionBtn");
+
+            inputField.value = "";
+            inputField.type = "password";
+            const toggleIcon = inputField.nextElementSibling;
+            if (toggleIcon) {
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+
+            let masterStoredKey = localStorage.getItem("ERGEB_DEVELOPER_PASSWORD");
+
+            if (!masterStoredKey) {
+                headlineNode.innerText = "Set Developer Password First";
+                instructNode.innerText = "No active administration security passcode profile discovered. Please nominate and initialize your custom access key below.";
+                inputField.placeholder = "Nominate New Access Passcode Token...";
+                actionButton.innerHTML = `<i class="fa fa-save"></i> Save & Initialize Access Key`;
+                actionButton.setAttribute("onclick", "initializeCustomDeveloperKeyPipeline()");
+            } else {
+                headlineNode.innerText = "Fill Password First";
+                instructNode.innerText = "Input master workspace credentials tokens below to clear visual security blockades.";
+                inputField.placeholder = "Enter Administrative Token...";
+                actionButton.innerHTML = `<i class="fa fa-unlock"></i> Enter Developer Page`;
+                actionButton.setAttribute("onclick", "executeDeveloperConsoleAuthorizationPipeline()");
+            }
+            advanceWorkflowStage('commentStageDeveloperAuthenticationGate');
+        }
+
+        function initializeCustomDeveloperKeyPipeline() {
+            const inputField = document.getElementById("developerPortalVerificationTokenField");
+            let requestedTokenValue = inputField.value.trim();
+
+            if (!requestedTokenValue || requestedTokenValue.length < 3) {
+                alert("Security Error: Passcode string allocation value must contain at least 3 characters.");
+                return;
+            }
+
+            localStorage.setItem("ERGEB_DEVELOPER_PASSWORD", requestedTokenValue);
+            alert("Success! Custom security credentials locked down into localized platform storage parameters.");
+            prepareAndVerifyDeveloperGateState();
+        }
+
+        function executeDeveloperConsoleAuthorizationPipeline() {
+            const tokenField = document.getElementById("developerPortalVerificationTokenField");
+            let masterPasscodeValue = localStorage.getItem("ERGEB_DEVELOPER_PASSWORD") || "admin123";
+            
+            if(tokenField.value === masterPasscodeValue) {
+                tokenField.value = "";
+                advanceWorkflowStage('commentStageDeveloperVerifiedDashboardDesk');
+                synchronizeDeveloperWorkspaceDropdownOptions();
+                renderActiveDeveloperTargetChatWindow();
+            } else {
+                alert("Authentication Intercept Prevented: Security key mismatch identified.");
+            }
+        }
+
+        function modifyAndSaveDeveloperMasterPassword() {
+            const modificationInput = document.getElementById("developerConsoleNewPasswordChangeField");
+            let alteredTokenValue = modificationInput.value.trim();
+
+            if (!alteredTokenValue || alteredTokenValue.length < 3) {
+                alert("Modification Flag Refused: Target replacement key sequence string length must exceed 2 symbols.");
+                return;
+            }
+
+            localStorage.setItem("ERGEB_DEVELOPER_PASSWORD", alteredTokenValue);
+            modificationInput.value = "";
+            const toggleIcon = modificationInput.nextElementSibling;
+            if (toggleIcon) {
+                modificationInput.type = "password";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+            alert("Master administrative passcode entry token modified successfully.");
+        }
+
+        /* ==================== DYNAMIC CODE EXECUTION & MODIFICATION METHOD SYSTEM ==================== */
+        function loadSelectedMethodCodeTemplateIntoConsole() {
+            const selector = document.getElementById("developerMethodTemplateSelector");
+            const codeConsole = document.getElementById("developerLiveTerminalCodeArea");
+            
+            const scriptsMap = {
+                custom: `// Enter your JavaScript logic parameters block here...\nalert('Platform Runtime Injected Successfully!');`,
+                alertChange: `// Method: Alter Core Platform Title Header\ndocument.querySelector('#mainAppHeader h1').innerText = "ERGEB [DEVELOPER CORE OVERRIDE]";\nconsole.log("Header element text updated successfully.");`,
+                colorOverride: `// Method: Force Matrix Background Overlay Style\ndocument.querySelectorAll('.workspace-card').forEach(card => {\n    card.style.border = "2px solid #00ff66";\n    card.style.boxShadow = "0px 0px 20px rgba(0,255,102,0.4)";\n});`,
+                clearLogs: `// Method: Flush Active Runtime Feedback Datasets\nif(confirm("Confirm deletion of all memory reviews nodes?")) {\n    localStorage.removeItem("ERGEB_PLATFORM_OPINIONS");\n    location.reload();\n}`
+            };
+            
+            if(selector.value in scriptsMap) {
+                codeConsole.value = scriptsMap[selector.value];
+            }
+        }
+
+        function applyAndExecuteDeveloperTerminalCode() {
+            const codeConsole = document.getElementById("developerLiveTerminalCodeArea");
+            try {
+                eval(codeConsole.value);
+            } catch(err) {
+                alert("Terminal Runtime Parse Exception: " + err.message);
+            }
+        }
+
+        function resetDeveloperTerminalCodeArea() {
+            document.getElementById("developerLiveTerminalCodeArea").value = "";
+            document.getElementById("developerMethodTemplateSelector").value = "custom";
+        }
+
+        function lockDeveloperTerminalAccessSession() {
+            advanceWorkflowStage('commentStageInteractionHubMenu');
+        }
+
+        /* ==================== PLATFORM SYSTEM OPINIONS REGISTER CHANNELS ==================== */
+        function processNewUserOpinionPacket(event) {
+            event.preventDefault();
+            const nameNode = document.getElementById("opinionNameField");
+            const textNode = document.getElementById("opinionContentField");
+
+            let packet = {
+                author: nameNode.value.trim(),
+                content: textNode.value.trim(),
+                timestamp: new Date().toLocaleString()
+            };
+
+            localCacheOpinionsDatabase.unshift(packet);
+            localStorage.setItem("ERGEB_PLATFORM_OPINIONS", JSON.stringify(localCacheOpinionsDatabase));
+            
+            nameNode.value = "";
+            textNode.value = "";
+            rebuildPlatformOpinionsLogViewFeed();
+        }
+
+        function rebuildPlatformOpinionsLogViewFeed() {
+            const renderBox = document.getElementById("opinionFeedRenderBox");
+            if(!renderBox) return;
+            renderBox.innerHTML = "";
+
+            if(localCacheOpinionsDatabase.length === 0) {
+                renderBox.innerHTML = `<p style="color:gray; font-style:italic;">No live assessment data tracking records logged inside database array instances yet.</p>`;
+                return;
+            }
+
+            const positiveKeywords = ["good", "great", "excellent", "awesome", "nice", "perfect", "love", "best"];
+            
+            localCacheOpinionsDatabase.forEach(item => {
+                let textCheck = item.content.toLowerCase();
+                let isPositive = positiveKeywords.some(keyword => textCheck.includes(keyword));
+                let nodeThemeClass = isPositive ? "opinion-node-positive" : "opinion-node-negative";
+
+                let node = document.createElement("div");
+                node.className = `opinion-log-item ${nodeThemeClass}`;
+                node.innerHTML = `<strong>${item.author}</strong> <span style="font-size:12px; opacity:0.6; float:right;">${item.timestamp}</span>
+                                  <p style="margin-top:6px; font-family:sans-serif; line-height:1.4;">${item.content}</p>`;
+                renderBox.appendChild(node);
+            });
+        }
+
+        /* ==================== COMMUNICATOR DATA SOCKET GUEST CORES ==================== */
+        function prepareAndResetGuestInputModule() {
+            // Re-zero ui state panel layers
+            document.getElementById("guestRegisterUsernameInput").value = "";
+            document.getElementById("guestLoginCodeInputField").value = "";
+            
+            document.getElementById("guestPageMainHeadline").innerText = "Sign Up Page";
+            document.getElementById("guestPageSubInstructions").innerText = "Declare a tracking alias block handle value below to acquire system keys.";
+            
+            document.getElementById("guestSignUpActionHaltModule").style.display = "block";
+            document.getElementById("guestLoginVerificationModule").style.display = "none";
+            document.getElementById("guestSignUpTokenRevealArea").style.display = "none";
+            
+            advanceWorkflowStage('commentStageGuestRegistrationForm');
+        }
+
+        function executeGuestAccountRegistrationPipeline() {
+            const nameInput = document.getElementById("guestRegisterUsernameInput");
+            let userTag = nameInput.value.trim();
+
+            if(!userTag) {
+                alert("Pipeline Terminated: Target profile key tracking moniker input string is blank.");
+                return;
+            }
+
+            // DYNAMIC DETECTOR FLOW ENGINE
+            if(localCacheGuestDirectory[userTag]) {
+                // USER ALREADY EXISTS -> SWAP INTERFACE STATE CHANNELS INTO STRICT LOGIN MODE
+                globalRuntimeActiveGuestSessionUserKey = userTag;
+                
+                document.getElementById("guestPageMainHeadline").innerText = "Fill Password First";
+                document.getElementById("guestPageSubInstructions").innerText = "This profile is registered. Provide your 4-digit token key access matrix code parameters below.";
+                
+                document.getElementById("guestSignUpActionHaltModule").style.display = "none";
+                document.getElementById("guestLoginVerificationModule").style.display = "block";
+            } else {
+                // USER DOES NOT EXIST -> SETUP RUNTIME NEW ID CHANNELS
+                let code = Math.floor(1000 + Math.random() * 9000);
+                localCacheGuestDirectory[userTag] = code;
+                localStorage.setItem("ERGEB_PLATFORM_GUEST_REGISTRY", JSON.stringify(localCacheGuestDirectory));
+
+                globalRuntimeActiveGuestSessionUserKey = userTag;
+                document.getElementById("renderedGuestSecurePasswordCodeNode").innerText = code;
+                document.getElementById("activeGuestSessionIdentityLabelText").innerText = userTag;
+                
+                document.getElementById("guestSignUpActionHaltModule").style.display = "none";
+                document.getElementById("guestSignUpTokenRevealArea").style.display = "block";
+                
+                synchronizeDeveloperWorkspaceDropdownOptions();
+                rebuildGuestInterfaceViewWindow();
+            }
+        }
+
+        function validateGuestPasscodeLoginStream() {
+            const tokenInput = document.getElementById("guestLoginCodeInputField");
+            let inputtedCode = tokenInput.value.trim();
+            let actualSavedCode = localCacheGuestDirectory[globalRuntimeActiveGuestSessionUserKey];
+
+            if(String(inputtedCode) === String(actualSavedCode)) {
+                document.getElementById("activeGuestSessionIdentityLabelText").innerText = globalRuntimeActiveGuestSessionUserKey;
+                tokenInput.value = "";
+                
+                advanceWorkflowStage('commentStageGuestToDeveloperChatConsole');
+                rebuildGuestInterfaceViewWindow();
+            } else {
+                alert("Access Mismatch Exception: Checked passcode array allocation key validation failed.");
+            }
+        }
+
+        function dispatchGuestMessageToDeveloperPipeline() {
+            const msgInput = document.getElementById("guestChatMessageTextInput");
+            let rawContent = msgInput.value.trim();
+            if(!rawContent) return;
+
+            if(!localCacheChatTransmissionsLog[globalRuntimeActiveGuestSessionUserKey]) {
+                localCacheChatTransmissionsLog[globalRuntimeActiveGuestSessionUserKey] = [];
+            }
+
+            localCacheChatTransmissionsLog[globalRuntimeActiveGuestSessionUserKey].push({
+                sender: "guest",
+                body: rawContent
+            });
+
+            localStorage.setItem("ERGEB_PLATFORM_CHATS", JSON.stringify(localCacheChatTransmissionsLog));
+            msgInput.value = "";
+            rebuildGuestInterfaceViewWindow();
+        }
+
+        function rebuildGuestInterfaceViewWindow() {
+            const box = document.getElementById("guestChatFeedScrollWindow");
+            box.innerHTML = "";
+            let history = localCacheChatTransmissionsLog[globalRuntimeActiveGuestSessionUserKey] || [];
+
+            history.forEach(chat => {
+                let bubble = document.createElement("div");
+                bubble.className = `msg-bubble ${chat.sender === 'guest' ? 'msg-guest' : 'msg-developer'}`;
+                bubble.innerText = chat.body;
+                box.appendChild(bubble);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function terminateAndClearActiveGuestSession() {
+            globalRuntimeActiveGuestSessionUserKey = "";
+            prepareAndResetGuestInputModule();
+            advanceWorkflowStage('commentStageInteractionHubMenu');
+        }
+
+        /* ==================== DEV SYSTEM MESSAGE DISPATCH PIPELINES ==================== */
+        function synchronizeDeveloperWorkspaceDropdownOptions() {
+            const selector = document.getElementById("developerTargetChannelDropdownSelector");
+            if(!selector) return;
+            
+            let preservedActiveKey = selector.value;
+            selector.innerHTML = "";
+
+            let userKeys = Object.keys(localCacheGuestDirectory);
+            if(userKeys.length === 0) {
+                selector.innerHTML = `<option value="">-- No Active Guest Stream Sockets Available --</option>`;
+                return;
+            }
+
+            userKeys.forEach(user => {
+                let opt = document.createElement("option");
+                opt.value = user;
+                opt.innerText = `Channel: ${user} (Key: ${localCacheGuestDirectory[user]})`;
+                selector.appendChild(opt);
+            });
+
+            if(userKeys.includes(preservedActiveKey)) {
+                selector.value = preservedActiveKey;
+            }
+        }
+
+        function renderActiveDeveloperTargetChatWindow() {
+            const selector = document.getElementById("developerTargetChannelDropdownSelector");
+            const box = document.getElementById("developerChatFeedScrollWindow");
+            box.innerHTML = "";
+
+            let currentChannel = selector.value;
+            if(!currentChannel) {
+                box.innerHTML = `<p style="color:gray; font-style:italic; padding:10px;">Select an operational downstream registry node from dropdown arrays to mount view ports.</p>`;
+                return;
+            }
+
+            let history = localCacheChatTransmissionsLog[currentChannel] || [];
+            history.forEach(chat => {
+                let bubble = document.createElement("div");
+                bubble.className = `msg-bubble ${chat.sender === 'guest' ? 'msg-guest' : 'msg-developer'}`;
+                bubble.innerText = chat.body;
+                box.appendChild(bubble);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function dispatchDeveloperReplyToActiveChannelPipeline() {
+            const selector = document.getElementById("developerTargetChannelDropdownSelector");
+            const textNode = document.getElementById("developerResponsePacketTextArea");
+            let targetChannel = selector.value;
+            let replyText = textNode.value.trim();
+
+            if(!targetChannel || !replyText) return;
+
+            if(!localCacheChatTransmissionsLog[targetChannel]) localCacheChatTransmissionsLog[targetChannel] = [];
+
+            localCacheChatTransmissionsLog[targetChannel].push({
+                sender: "developer",
+                body: replyText
+            });
+
+            localStorage.setItem("ERGEB_PLATFORM_CHATS", JSON.stringify(localCacheChatTransmissionsLog));
+            textNode.value = "";
+            renderActiveDeveloperTargetChatWindow();
+        }
+
+        /* ==================== GLOBAL UTILITY HANDLERS ==================== */
+        document.getElementById("modeBtn").addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            document.getElementById("modeBtn").innerHTML = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+            
+            document.querySelectorAll(".workspace-card h1, .workspace-card h2").forEach(title => {
+                title.style.color = isDark ? "white" : "#222";
+            });
+        });
+
+        const topBtn = document.getElementById("topBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                topBtn.style.display = "block";
+            } else {
+                topBtn.style.display = "none";
+            }
+        };
+        topBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
